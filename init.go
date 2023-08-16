@@ -10,13 +10,15 @@ import (
 )
 
 const (
-	AppConfigTOML = "app_config.toml"
+	AppConfigTOML    = "app_config.toml"
+	PublicFolderName = "public"
 )
 
 var (
 	app_config      *AppConfig
 	app_root        = filepath.Dir(executable())
 	app_config_path = filepath.Join(app_root, AppConfigTOML)
+	public_folder   = filepath.Join(app_root, PublicFolderName)
 )
 
 func init() {
