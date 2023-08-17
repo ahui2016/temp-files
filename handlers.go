@@ -1,0 +1,38 @@
+package main
+
+import (
+	"path/filepath"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// noCache is a middleware.
+// Cache-Control: no-store will refrain from caching.
+// You will always get the up-to-date response.
+func noCache(c *fiber.Ctx) error {
+	c.Set("Cache-Control", "no-store")
+	return c.Next()
+}
+
+func getFileList(c *fiber.Ctx) error {
+	files, err := allFiles()
+	if err != nil {
+		return err
+	}
+	return c.JSON(files)
+}
+
+func allFiles() (files []*File, err error) {
+	paths, err := filepath.Glob(files_folder + Separator + "*")
+	if err != nil {
+		return nil, err
+	}
+	for _, filePath := range paths {
+		f, err := NewFile(filePath)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, f)
+	}
+	return
+}

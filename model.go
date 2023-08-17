@@ -1,5 +1,11 @@
 package main
 
+import (
+	"os"
+	"strconv"
+	"strings"
+)
+
 type AppConfig struct {
 	Host string
 }
@@ -12,8 +18,31 @@ type File struct {
 }
 
 // NewFile 根据服务器中的文件名解析出一个 File
-func NewFile(timeName string) *File {}
+func NewFile(filePath string) (*File, error) {
+	f := new(File)
+	info, err := os.Stat(filePath)
+	if err != nil {
+		return nil, err
+	}
+	f.CTime, f.Name, err = splitTimeName(info.Name())
+	f.Size = info.Size()
+	if strings.HasSuffix(f.Name, ".txt") || strings.HasSuffix(f.Name, ".md") {
+		f.IsText = true
+	}
+	return f, err
+}
+
+func splitTimeName(timeName string) (time int64, name string, err error) {
+	array := strings.SplitN(timeName, "-", 2)
+	if len(array) == 2 {
+		time, err = strconv.ParseInt(array[0], 10, 64)
+		return time, array[1], err
+	}
+	return 0, timeName, nil
+}
 
 // TimeName 返回 CTime-Name (用连字号连接两个字符串)
 // 用来作为保存在服务器时的文件名.
-func (f *File) TimeName() string {}
+func (f *File) TimeName() string {
+	return strconv.FormatInt(f.CTime, 10) + "-" + f.Name
+}

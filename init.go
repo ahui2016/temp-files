@@ -12,13 +12,16 @@ import (
 const (
 	AppConfigTOML    = "app_config.toml"
 	PublicFolderName = "public"
+	FilesFolderName  = "files"
 )
 
 var (
-	app_config      *AppConfig
+	Separator       = string(filepath.Separator)
 	app_root        = filepath.Dir(executable())
+	app_config      *AppConfig
 	app_config_path = filepath.Join(app_root, AppConfigTOML)
 	public_folder   = filepath.Join(app_root, PublicFolderName)
+	files_folder    = filepath.Join(app_root, FilesFolderName)
 )
 
 func init() {

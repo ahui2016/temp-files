@@ -15,5 +15,9 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
+	api := app.Group("/api")
+
+	api.Get("/files", getFileList)
+
 	log.Fatal(app.Listen(app_config.Host))
 }
