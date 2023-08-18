@@ -4,42 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>temp-files 保存臨時檔案</title>
+  <script src="jquery.slim.min.js"></script>
+  <script src="dayjs.min.js"></script>
+  <script src="util.js"></script>
 </head>
 <body>
 
-<div id="upload-form">
-  <label for="file">Choose file to upload</label>
+<p>
   <input type="file" id="file" name="file" />
+</p>
 
-  <div id="check-file">
-    <button id="check-file-btn">Check</button>
-    <div id="check-file-alert"></div>
-  </div>
-</div>
+<p id="check-file-area">
+  <button id="check-file-btn">Check</button>
+  <div id="check-file-alert"></div>
+</p>
 
-<script src="jquery.slim.min.js"></script>
-<script src="dayjs.min.js"></script>
-<script src="util.js"></script>
+<p>
+  <button id="upload-file-btn">Upload</button>
+</p>
+
+<p id="upload-status-area">
+  Upload Status: <span id="upload-status"></span>
+</p>
+
 <script>
-
-const fileElem = document.querySelector('#file');
+const fileInput = raw('#file');
+const checkFileArea = $('#check-file-area');
+const checkFileBtn = $('#check-file-btn');
 const checkFileAlert = $('#check-file-alert');
+const uploadBtn = $('#upload-file-btn');
+const uploadStatusArea = $('#upload-status-area');
+const uploadStatus = $('#upload-status');
 
-$('#check-file-btn').on('click', event => {
+init();
+
+function init() {
+  uploadBtn.hide();
+  uploadStatusArea.hide();
+}
+
+checkFileBtn.on('click', event => {
   event.preventDefault();
   checkFileAlert.html('').append(p(timeNow()));
 
-  const n = raw('#file').files.length;
+  const n = fileInput.files.length;
   if (n == 1) {
-    const file = raw('#file').files[0];
+    const file = fileInput.files[0];
     checkFileAlert.append(p().append(
       span(`File Name: ${file.name}`), br(),
-      span(`File Type: ${file.type}`), br(),
       span(`File Size: ${fileSizeToString(file.size)}`)
     ));
+    uploadBtn.show();
   } else {
     checkFileAlert.append(p("no file chosen"));
+    uploadBtn.hide();
+    uploadStatusArea.hide();
   }
+});
+
+uploadBtn.on('click', event => {
+  event.preventDefault();
+  uploadStatusArea.show();
+  uploadStatus.text(`${timeNow()} Uploading...`);
+
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+
+  Util.disable(uploadBtn);
+  uploadFile({
+    url: "/api/upload-file",
+    formData: formData,
+    onSuccess: async (resp) => {
+      const result = await response.json()
+      uploadStatus.text(`${timeNow()} [${resp.status}] ${result.text}`);
+    },
+    onError: (err) => {
+      Util.enable(uploadBtn);
+      uploadStatus.text(`${timeNow()} Error: ${err}`);
+    }
+  });
 });
 
 getFiles();
