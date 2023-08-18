@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>temp-files 保存臨時檔案</title>
+</head>
+<body>
+
+<div id="upload-form">
+  <label for="file">Choose file to upload</label>
+  <input type="file" id="file" name="file" />
+
+  <div id="check-file">
+    <button id="check-file-btn">Check</button>
+    <div id="check-file-alert"></div>
+  </div>
+</div>
+
+<script src="jquery.slim.min.js"></script>
+<script src="dayjs.min.js"></script>
+<script src="util.js"></script>
+<script>
+
+const fileElem = document.querySelector('#file');
+const checkFileAlert = $('#check-file-alert');
+
+$('#check-file-btn').on('click', event => {
+  event.preventDefault();
+  checkFileAlert.html('').append(p(timeNow()));
+
+  const n = raw('#file').files.length;
+  if (n == 1) {
+    const file = raw('#file').files[0];
+    checkFileAlert.append(p().append(
+      span(`File Name: ${file.name}`), br(),
+      span(`File Type: ${file.type}`), br(),
+      span(`File Size: ${fileSizeToString(file.size)}`)
+    ));
+  } else {
+    checkFileAlert.append(p("no file chosen"));
+  }
+});
+
+getFiles();
+
+async function getFiles() {
+  const resp = await fetch("/api/files");
+  const headers = resp.headers.entries();
+  console.log(Array.from(headers));
+
+  const files = await resp.json();
+  console.log(files);
+}
+
+</script>
+</body>
+</html>

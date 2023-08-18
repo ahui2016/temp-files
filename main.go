@@ -11,9 +11,7 @@ func main() {
 		Immutable: true, // 以后试试删除该设定
 	})
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	app.Static("/", public_folder)
 
 	api := app.Group("/api")
 
