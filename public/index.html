@@ -70,14 +70,19 @@ uploadBtn.on('click', event => {
   const file = fileInput.files[0];
   const formData = new FormData();
   formData.append("file", file);
+  const obj = {
+    method: "POST",
+    body: formData,
+  }
 
   Util.disable(uploadBtn);
-  uploadFile({
+  Util.fetch({
     url: "/api/upload-file",
-    formData: formData,
+    obj: obj,
     onSuccess: async (resp) => {
-      const result = await response.json()
-      uploadStatus.text(`${timeNow()} [${resp.status}] ${result.text}`);
+      uploadStatus.text(`${timeNow()} Successfully uploaded.`);
+      Util.disable($(fileInput));
+      Util.disable(checkFileBtn);
     },
     onError: (err) => {
       Util.enable(uploadBtn);

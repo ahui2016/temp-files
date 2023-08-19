@@ -16,6 +16,7 @@ func main() {
 	api := app.Group("/api")
 
 	api.Get("/files", getFileList)
+	api.Post("/upload-file", uploadFileHandler)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

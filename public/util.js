@@ -61,19 +61,24 @@ function timeNow() {
 }
 
 /**
- * Upload file using an HTML input element, FormData and fetch().
  * https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
- * fetchOptions {url, formData, onSuccess, onError, onAlways}
+ * fetchOptions {url, obj, onSuccess, onError, onAlways}
  */
-async function uploadFile(fetchOptions) {
+Util.fetch = async function (fetchOptions) {
   let resp = null;
   try {
-    resp = await fetch(fetchOptions.url, {
-      method: "POST",
-      body: fetchOptions.formData,
-    });
+    resp = await fetch(fetchOptions.url, fetchOptions.obj);
     if (!resp.ok) {
-      throw new Error(`Response NG: [${resp.status}] ${resp.statusText}`);
+      let errMsg = `[${resp.status}] ${resp.statusText}`;
+      if (resp.headers.get("Content-Type").startsWith("text/plain")) {
+        const data = await resp.text();
+        errMsg += ` ${data}`;
+      }
+      if (resp.headers.get("Content-Type").startsWith("application/json")) {
+        const data = await resp.json(); 
+        errMsg += ` ${JSON.stringify(data)}`;
+      }
+      throw new Error(errMsg);
     }
     if (fetchOptions.onSuccess) {
       fetchOptions.onSuccess(resp);
@@ -82,7 +87,7 @@ async function uploadFile(fetchOptions) {
     if (fetchOptions.onError) {
       fetchOptions.onError(err);
     }
-    console.error("Error:", err);
+    console.error(err);
   }
   if (fetchOptions.onAlways) {
     fetchOptions(resp);

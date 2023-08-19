@@ -1,13 +1,16 @@
 package main
 
 import (
+	"mime/multipart"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type AppConfig struct {
-	Host string
+	Host        string
+	UploadLimit int64 // MB
 }
 
 type File struct {
@@ -17,8 +20,18 @@ type File struct {
 	IsText bool   // true if File.Name ends with ".txt" or ".md"
 }
 
-// NewFile 根据服务器中的文件名解析出一个 File
-func NewFile(filePath string) (*File, error) {
+// NewFileFromUser 根据用户上传的文件解析出一个 File
+func NewFileFromUser(file *multipart.FileHeader) *File {
+	return &File{
+		CTime: time.Now().Unix(),
+		Name:  file.Filename,
+		Size:  file.Size,
+		// IsText: 此时文件类型不重要
+	}
+}
+
+// NewFileFromServer 根据服务器中的文件名解析出一个 File
+func NewFileFromServer(filePath string) (*File, error) {
 	f := new(File)
 	info, err := os.Stat(filePath)
 	if err != nil {

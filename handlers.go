@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,13 +23,26 @@ func getFileList(c *fiber.Ctx) error {
 	return c.JSON(files)
 }
 
+func uploadFileHandler(c *fiber.Ctx) error {
+	file, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	if file.Size > app_config.UploadLimit*MB {
+		return fmt.Errorf("the file is too large (> %d MB)", app_config.UploadLimit)
+	}
+	f := NewFileFromUser(file)
+	filePath := filepath.Join(files_folder, f.TimeName())
+	return c.SaveFile(file, filePath)
+}
+
 func allFiles() (files []*File, err error) {
 	paths, err := filepath.Glob(files_folder + Separator + "*")
 	if err != nil {
 		return nil, err
 	}
 	for _, filePath := range paths {
-		f, err := NewFile(filePath)
+		f, err := NewFileFromServer(filePath)
 		if err != nil {
 			return nil, err
 		}

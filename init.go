@@ -10,6 +10,10 @@ import (
 )
 
 const (
+	MB = 1024 * 1024
+)
+
+const (
 	AppConfigTOML    = "app_config.toml"
 	PublicFolderName = "public"
 	FilesFolderName  = "files"
