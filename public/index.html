@@ -7,7 +7,7 @@
   <title>temp-files 保存臨時檔案</title>
 
   <link rel="stylesheet" href="/style.css">
-  <script src="jquery.slim.min.js"></script>
+  <script src="jquery.min.js"></script>
   <script src="dayjs.min.js"></script>
   <script src="util.js"></script>
 </head>
@@ -29,7 +29,8 @@
     <div>
       <span class="datetime mr-1"></span>
       <span class="filesize mr-2"></span>
-      <a href="#" class="item-buttons del-btn mr-1">del</a>
+      <a href="#" class="item-buttons toggle-del-btn mr-1">del</a>
+      <a href="#" class="item-buttons del-btn mr-1">delete</a>
     </div>
     <div class="item-status"></div>
   </div>
@@ -78,12 +79,32 @@ function newFileItem(file) {
   datetime.textContent = dayjs.unix(file.CTime).format(DATE_TIME_FORMAT);
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
+  const toggleBtn = item.querySelector(".toggle-del-btn");
+  toggleBtn.addEventListener("click", event => {
+    event.preventDefault();
+    toggleDelBtn(itemID);
+  });
   const delBtn = item.querySelector(".del-btn");
+  delBtn.style.display = "none";
   delBtn.addEventListener("click", event => {
     event.preventDefault();
     deleteFile(file, itemID);
   });
   return item;
+}
+
+function toggleDelBtn(itemID) {
+  const item = $("#"+itemID);
+  const itemStatus = item.find(".item-status");
+  const toggleBtn = item.find(".toggle-del-btn");
+  const delBtn = item.find(".del-btn");
+  Util.disable(toggleBtn);
+  itemStatus
+    .text("點擊紅色的 delete 按鈕徹底刪除檔案，不可恢復。")
+    .css("color", "blue");
+  toggleBtn.fadeOut(2000, () => {
+    delBtn.show();
+  });
 }
 
 function deleteFile(file, itemID) {
