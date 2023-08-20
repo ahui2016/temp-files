@@ -29,7 +29,9 @@
     <div>
       <span class="datetime mr-1"></span>
       <span class="filesize mr-2"></span>
+      <a href="#" class="item-buttons del-btn mr-1">del</a>
     </div>
+    <div class="item-status"></div>
   </div>
 </template>
 
@@ -52,6 +54,11 @@ async function loadFiles() {
       const files = await resp.json();
       appendFiles(files);
     },
+    onError: (err) => {
+      pageAlert.append(
+        p(`${timeNow()} ${err}`).css("color", "red")
+      );
+    },
   });
 }
 
@@ -63,14 +70,44 @@ function appendFiles(files) {
 
 function newFileItem(file) {
   const item = fileItemTmpl.content.cloneNode(true);
-  item.children[0].setAttribute("id", `f-${file.CTime}`);
+  const itemID = `f-${file.CTime}`;
+  item.children[0].setAttribute("id", itemID);
   const filename = item.querySelector(".filename");
   filename.textContent = file.Name;
   const datetime = item.querySelector(".datetime");
   datetime.textContent = dayjs.unix(file.CTime).format(DATE_TIME_FORMAT);
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
+  const delBtn = item.querySelector(".del-btn");
+  delBtn.addEventListener("click", event => {
+    event.preventDefault();
+    deleteFile(file, itemID);
+  });
   return item;
+}
+
+function deleteFile(file, itemID) {
+  const item = $("#"+itemID);
+  const itemStatus = item.find(".item-status");
+  const btn = item.find(".del-btn");
+  const data = {
+    filename: `${file.CTime}-${file.Name}`,
+  };
+
+  Util.disable(btn);
+  Util.postJSON(data, {
+    url: "/api/delete-file",
+    onSuccess: () => {
+      itemStatus.text("DELETED").css("color", "blue");
+      item.find(".item-buttons").hide();
+    },
+    onError: (err) => {
+      itemStatus.text(`${timeNow()} ${err}`).css("color", "red");
+    },
+    onAlways: () => {
+      Util.enable(btn);
+    }
+  });
 }
 
 </script>

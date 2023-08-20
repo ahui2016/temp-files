@@ -92,8 +92,21 @@ Util.fetch = async function (fetchOptions) {
     console.error(err);
   }
   if (fetchOptions.onAlways) {
-    fetchOptions(resp);
+    fetchOptions.onAlways(resp);
   }
+}
+
+/**
+ * fetchOptions {url, null, onSuccess, onError, onAlways}
+ */
+Util.postJSON = function (data, fetchOptions) {
+  const obj = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  };
+  fetchOptions.obj = obj;
+  Util.fetch(fetchOptions);
 }
 
 /**

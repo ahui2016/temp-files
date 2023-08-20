@@ -88,14 +88,14 @@ uploadBtn.on('click', event => {
   Util.fetch({
     url: "/api/upload-file",
     obj: obj,
-    onSuccess: (resp) => {
+    onSuccess: () => {
       uploadStatus.text(`${timeNow()} Successfully uploaded.`).css("color", "blue");
       Util.disable($(fileInput));
       Util.disable(checkFileBtn);
     },
     onError: (err) => {
       Util.enable(uploadBtn);
-      uploadStatus.text(`${timeNow()} Error: ${err}`).css("color", "red");
+      uploadStatus.text(`${timeNow()} ${err}`).css("color", "red");
     }
   });
 });
