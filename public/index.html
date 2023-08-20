@@ -3,103 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>temp-files 保存臨時檔案</title>
+
+  <link rel="stylesheet" href="/style.css">
   <script src="jquery.slim.min.js"></script>
   <script src="dayjs.min.js"></script>
   <script src="util.js"></script>
 </head>
 <body>
 
-<p>
-  <input type="file" id="file" name="file" />
-</p>
+<h2>All Files</h2>
 
-<p id="check-file-area">
-  <button id="check-file-btn">Check</button>
-  <div id="check-file-alert"></div>
-</p>
+<div class="text-right">
+  <a href="upload.html">Upload</a>
+</div>
 
-<p>
-  <button id="upload-file-btn">Upload</button>
-</p>
+<div id="page-alert"></div>
 
-<p id="upload-status-area">
-  Upload Status: <span id="upload-status"></span>
-</p>
+<div id="file-list"></div>
+
+<template id="file-item">
+  <div class="FileItem mb-3">
+    <div class="filename font-bold"></div>
+    <div>
+      <span class="datetime mr-1"></span>
+      <span class="filesize mr-2"></span>
+    </div>
+  </div>
+</template>
 
 <script>
-const fileInput = raw('#file');
-const checkFileArea = $('#check-file-area');
-const checkFileBtn = $('#check-file-btn');
-const checkFileAlert = $('#check-file-alert');
-const uploadBtn = $('#upload-file-btn');
-const uploadStatusArea = $('#upload-status-area');
-const uploadStatus = $('#upload-status');
+const pageAlert = $('#page-alert');
+const fileList = raw('#file-list');
+const fileItemTmpl = raw('#file-item');
 
 init();
 
 function init() {
-  uploadBtn.hide();
-  uploadStatusArea.hide();
+  loadFiles();
 }
 
-checkFileBtn.on('click', event => {
-  event.preventDefault();
-  checkFileAlert.html('').append(p(timeNow()));
-
-  const n = fileInput.files.length;
-  if (n == 1) {
-    const file = fileInput.files[0];
-    checkFileAlert.append(p().append(
-      span(`File Name: ${file.name}`), br(),
-      span(`File Size: ${fileSizeToString(file.size)}`)
-    ));
-    uploadBtn.show();
-  } else {
-    checkFileAlert.append(p("no file chosen"));
-    uploadBtn.hide();
-    uploadStatusArea.hide();
-  }
-});
-
-uploadBtn.on('click', event => {
-  event.preventDefault();
-  uploadStatusArea.show();
-  uploadStatus.text(`${timeNow()} Uploading...`);
-
-  const file = fileInput.files[0];
-  const formData = new FormData();
-  formData.append("file", file);
-  const obj = {
-    method: "POST",
-    body: formData,
-  }
-
-  Util.disable(uploadBtn);
+async function loadFiles() {
   Util.fetch({
-    url: "/api/upload-file",
-    obj: obj,
+    url: "/api/files",
+    obj: null,
     onSuccess: async (resp) => {
-      uploadStatus.text(`${timeNow()} Successfully uploaded.`);
-      Util.disable($(fileInput));
-      Util.disable(checkFileBtn);
+      const files = await resp.json();
+      appendFiles(files);
     },
-    onError: (err) => {
-      Util.enable(uploadBtn);
-      uploadStatus.text(`${timeNow()} Error: ${err}`);
-    }
   });
-});
+}
 
-getFiles();
+function appendFiles(files) {
+  files.forEach(file => {
+    fileList.appendChild(newFileItem(file));
+  });
+}
 
-async function getFiles() {
-  const resp = await fetch("/api/files");
-  const headers = resp.headers.entries();
-  console.log(Array.from(headers));
-
-  const files = await resp.json();
-  console.log(files);
+function newFileItem(file) {
+  const item = fileItemTmpl.content.cloneNode(true);
+  item.children[0].setAttribute("id", `f-${file.CTime}`);
+  const filename = item.querySelector(".filename");
+  filename.textContent = file.Name;
+  const datetime = item.querySelector(".datetime");
+  datetime.textContent = dayjs.unix(file.CTime).format(DATE_TIME_FORMAT);
+  const filesize = item.querySelector(".filesize");
+  filesize.textContent = `(${fileSizeToString(file.Size)})`;
+  return item;
 }
 
 </script>

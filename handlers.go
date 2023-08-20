@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,6 +21,7 @@ func getFileList(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	slices.Reverse(files)
 	return c.JSON(files)
 }
 

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Upload .. temp-files</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <script src="jquery.slim.min.js"></script>
+  <script src="dayjs.min.js"></script>
+  <script src="util.js"></script>
+</head>
+<body>
+
+<h2>Upload File</h2>
+
+<div class="text-right">
+  <a href="/">Home</a>
+</div>
+
+<p>
+  <input type="file" id="file" name="file" />
+</p>
+
+<p id="check-file-area">
+  <button id="check-file-btn">Check</button>
+  <div id="check-file-alert"></div>
+</p>
+
+<p>
+  <button id="upload-file-btn">Upload</button>
+</p>
+
+<p id="upload-status-area">
+  Upload Status: <span id="upload-status"></span>
+</p>
+
+<script>
+const fileInput = raw('#file');
+const checkFileArea = $('#check-file-area');
+const checkFileBtn = $('#check-file-btn');
+const checkFileAlert = $('#check-file-alert');
+const uploadBtn = $('#upload-file-btn');
+const uploadStatusArea = $('#upload-status-area');
+const uploadStatus = $('#upload-status');
+
+init();
+
+function init() {
+  uploadBtn.hide();
+  uploadStatusArea.hide();
+}
+
+checkFileBtn.on('click', event => {
+  event.preventDefault();
+  checkFileAlert.html('').append(p(timeNow()));
+
+  const n = fileInput.files.length;
+  if (n == 1) {
+    const file = fileInput.files[0];
+    checkFileAlert.append(p().append(
+      span(`File Name: ${file.name}`), br(),
+      span(`File Size: ${fileSizeToString(file.size)}`)
+    ));
+    uploadBtn.show();
+  } else {
+    checkFileAlert.append(p("no file chosen"));
+    uploadBtn.hide();
+    uploadStatusArea.hide();
+  }
+});
+
+uploadBtn.on('click', event => {
+  event.preventDefault();
+  uploadStatusArea.show();
+  uploadStatus.text(`${timeNow()} Uploading...`).css("color", "");
+
+  const file = fileInput.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+  const obj = {
+    method: "POST",
+    body: formData,
+  }
+
+  Util.disable(uploadBtn);
+  Util.fetch({
+    url: "/api/upload-file",
+    obj: obj,
+    onSuccess: (resp) => {
+      uploadStatus.text(`${timeNow()} Successfully uploaded.`).css("color", "blue");
+      Util.disable($(fileInput));
+      Util.disable(checkFileBtn);
+    },
+    onError: (err) => {
+      Util.enable(uploadBtn);
+      uploadStatus.text(`${timeNow()} Error: ${err}`).css("color", "red");
+    }
+  });
+});
+
+</script>
+</body>
+</html>

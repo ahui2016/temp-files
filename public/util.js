@@ -1,5 +1,7 @@
 const Util = {}
 
+const DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss';
+
 /**
  * jElem is a JQuery<HTMLElement>
  */
