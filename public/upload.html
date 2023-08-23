@@ -10,6 +10,7 @@
   <script src="jquery.min.js"></script>
   <script src="dayjs.min.js"></script>
   <script src="util.js"></script>
+  <script src="check-pwd.js"></script>
 </head>
 <body>
 
@@ -52,6 +53,12 @@ function init() {
   uploadStatusArea.hide();
 }
 
+fileInput.addEventListener('change', event => {
+  event.preventDefault();
+  checkFileAlert.html('');
+  uploadBtn.hide();
+});
+
 checkFileBtn.on('click', event => {
   event.preventDefault();
   checkFileAlert.html('').append(p(timeNow()));
@@ -77,8 +84,12 @@ uploadBtn.on('click', event => {
   uploadStatus.text(`${timeNow()} Uploading...`).css("color", "");
 
   const file = fileInput.files[0];
+
+  // TODO: check file size
+
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("pwd", sessionStorage.getItem("pwd"));
   const obj = {
     method: "POST",
     body: formData,

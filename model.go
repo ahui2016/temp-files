@@ -11,6 +11,7 @@ import (
 type AppConfig struct {
 	Host        string
 	UploadLimit int64 // MB
+	Password    string
 }
 
 type File struct {

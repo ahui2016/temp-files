@@ -15,6 +15,7 @@ func main() {
 
 	api := app.Group("/api")
 
+	api.Post("/check-pwd", checkPassword)
 	api.Get("/files", getFileList)
 	api.Post("/upload-file", uploadFileHandler)
 

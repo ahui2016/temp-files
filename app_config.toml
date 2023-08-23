@@ -2,3 +2,6 @@ Host = '127.0.0.1:5000'
 
 # 上傳檔案體積上限，單位: MB
 UploadLimit = 1
+
+# 明文密码
+Password = 'abcd'

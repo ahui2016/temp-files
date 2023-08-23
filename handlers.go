@@ -30,6 +30,9 @@ func uploadFileHandler(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	if err := checkPassword(c); err != nil {
+		return err
+	}
 	if file.Size > app_config.UploadLimit*MB {
 		return fmt.Errorf("the file is too large (> %d MB)", app_config.UploadLimit)
 	}
@@ -51,4 +54,12 @@ func allFiles() (files []*File, err error) {
 		files = append(files, f)
 	}
 	return
+}
+
+func checkPassword(c *fiber.Ctx) error {
+	pwd := c.FormValue("pwd")
+	if pwd != app_config.Password {
+		return fmt.Errorf("wrong password")
+	}
+	return nil
 }

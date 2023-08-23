@@ -10,6 +10,7 @@
   <script src="jquery.min.js"></script>
   <script src="dayjs.min.js"></script>
   <script src="util.js"></script>
+  <script src="check-pwd.js"></script>
 </head>
 <body>
 
@@ -79,17 +80,20 @@ function newFileItem(file) {
   datetime.textContent = dayjs.unix(file.CTime).format(DATE_TIME_FORMAT);
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
+
   const toggleBtn = item.querySelector(".toggle-del-btn");
   toggleBtn.addEventListener("click", event => {
     event.preventDefault();
     toggleDelBtn(itemID);
   });
+
   const delBtn = item.querySelector(".del-btn");
   delBtn.style.display = "none";
   delBtn.addEventListener("click", event => {
     event.preventDefault();
     deleteFile(file, itemID);
   });
+
   return item;
 }
 
