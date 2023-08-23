@@ -1,5 +1,5 @@
 const formData = new FormData();
-formData.append("pwd", sessionStorage.getItem("pwd"));
+formData.append("pwd", localStorage.getItem("pwd"));
 
 const obj = {
   method: "POST",
@@ -10,6 +10,6 @@ Util.fetch({
   url: "/api/check-pwd",
   obj: obj,
   onError: (err) => {
-    window.location.href = "login.html";
+    // window.location.href = "login.html";
   }
 });

@@ -20,10 +20,61 @@
   <a href="upload.html">Upload</a>
 </div>
 
+<div id="page-alert"></div>
 
-<p>請登入</p>
+<form id="login-form">
+  <p>請登入</p>
+  <input type="password" name="password" id="password">
+  <button id="login-btn">login</button>
+</form>
+
+<div>
+  <button id="logout-btn">Logout</button>
+</div>
 
 <script>
+const pageAlert = $("#page-alert");
+const loginForm = $("#login-form");
+const pwdInput = $("#password");
+const loginBtn = $("#login-btn");
+const logoutBtn = $("#logout-btn");
+
+init();
+
+function init() {
+  loginForm.hide();
+  logoutBtn.hide();
+  checkPwd();
+}
+
+loginBtn.on("click", event => {
+  event.preventDefault();
+  const pwd = pwdInput.val();
+  if (!pwd) {
+    return;
+  }
+  localStorage.setItem("pwd", pwd);
+  window.location.reload();
+});
+
+logoutBtn.on("click", event => {
+  localStorage.setItem("pwd", "");
+  window.location.reload();
+});
+
+function checkPwd() {
+  Util.checkPwd({
+    onSuccess: () => {
+      pageAlert.append(p(`${timeNow()} You've been logged in. (已登入)`).css("color", "blue"));
+      logoutBtn.show();
+    },
+    onError: (err) => {
+      pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
+      loginForm.show();
+      Util.focus(pwdInput);
+    },
+  });
+}
 
 </script>
 </body>

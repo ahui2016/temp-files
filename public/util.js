@@ -62,6 +62,13 @@ function timeNow() {
   return dayjs().format("HH:mm:ss");
 }
 
+Util.focus = function (jElem, timeout = 300) {
+  setTimeout(() => {
+    jElem.trigger("focus");
+    jElem[0].setSelectionRange(1000, 1000);
+  }, timeout);
+};
+
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
  * fetchOptions {url, obj, onSuccess, onError, onAlways}
@@ -107,6 +114,30 @@ Util.postJSON = function (data, fetchOptions) {
   };
   fetchOptions.obj = obj;
   Util.fetch(fetchOptions);
+}
+
+/**
+ * handlers {onSuccess, onError}
+ */
+Util.checkPwd = function (handlers) {
+  const formData = new FormData();
+  formData.append("pwd", localStorage.getItem("pwd"));
+
+  const obj = {
+    method: "POST",
+    body: formData,
+  }
+
+  Util.fetch({
+    url: "/api/check-pwd",
+    obj: obj,
+    onSuccess: () => {
+      if (handlers.onSuccess) handlers.onSuccess();
+    },
+    onError: (err) => {
+      if (handlers.onError) handlers.onError(err);
+    }
+  });
 }
 
 /**
