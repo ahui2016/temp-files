@@ -127,13 +127,16 @@ function deleteFile(file, itemID) {
   const btn = item.find(".del-btn");
   const data = {
     filename: `${file.CTime}-${file.Name}`,
+    pwd: localStorage.getItem("pwd"),
   };
 
   Util.disable(btn);
   Util.postJSON(data, {
     url: "/api/delete-file",
     onSuccess: () => {
-      itemStatus.text("DELETED").css("color", "blue");
+      itemStatus.html('').append(
+        span("DELETED").css({color:"white",backgroundColor:"red"})
+      );
       item.find(".item-buttons").hide();
     },
     onError: (err) => {

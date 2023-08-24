@@ -18,6 +18,7 @@ func main() {
 	api.Post("/check-pwd", checkPassword)
 	api.Post("/files", getFileList)
 	api.Post("/upload-file", uploadFileHandler)
+	api.Post("/delete-file", deleteFile)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

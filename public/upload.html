@@ -112,7 +112,7 @@ uploadBtn.on('click', event => {
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("pwd", sessionStorage.getItem("pwd"));
+  formData.append("pwd", localStorage.getItem("pwd"));
   const obj = {
     method: "POST",
     body: formData,

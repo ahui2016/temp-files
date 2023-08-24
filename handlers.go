@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"slices"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
+
+var validate = validator.New()
 
 // noCache is a middleware.
 // Cache-Control: no-store will refrain from caching.
@@ -26,6 +30,21 @@ func getFileList(c *fiber.Ctx) error {
 	}
 	slices.Reverse(files)
 	return c.JSON(files)
+}
+
+func deleteFile(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
+	type Form struct {
+		Filename string `json:"filename" form:"filename" validate:"required"`
+	}
+	form := new(Form)
+	if err := parseValidate(form, c); err != nil {
+		return err
+	}
+	filePath := filepath.Join(files_folder, form.Filename)
+	return os.Remove(filePath)
 }
 
 func uploadFileHandler(c *fiber.Ctx) error {
@@ -71,4 +90,11 @@ func checkPassword(c *fiber.Ctx) error {
 		return fmt.Errorf("wrong password")
 	}
 	return nil
+}
+
+func parseValidate(form any, c *fiber.Ctx) error {
+	if err := c.BodyParser(form); err != nil {
+		return err
+	}
+	return validate.Struct(form)
 }
