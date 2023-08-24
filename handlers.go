@@ -17,6 +17,9 @@ func noCache(c *fiber.Ctx) error {
 }
 
 func getFileList(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
 	files, err := allFiles()
 	if err != nil {
 		return err
@@ -57,8 +60,14 @@ func allFiles() (files []*File, err error) {
 }
 
 func checkPassword(c *fiber.Ctx) error {
-	pwd := c.FormValue("pwd")
-	if pwd != app_config.Password {
+	type Pass struct {
+		Word string `json:"pwd" form:"pwd"`
+	}
+	pwd := new(Pass)
+	if err := c.BodyParser(pwd); err != nil {
+		return err
+	}
+	if pwd.Word != app_config.Password {
 		return fmt.Errorf("wrong password")
 	}
 	return nil
