@@ -89,11 +89,11 @@ func checkParseFilename(c *fiber.Ctx) (filename string, err error) {
 }
 
 func uploadFileHandler(c *fiber.Ctx) error {
-	file, err := c.FormFile("file")
-	if err != nil {
+	if err := checkPassword(c); err != nil {
 		return err
 	}
-	if err := checkPassword(c); err != nil {
+	file, err := c.FormFile("file")
+	if err != nil {
 		return err
 	}
 	if file.Size > app_config.UploadLimit*MB {
@@ -102,6 +102,22 @@ func uploadFileHandler(c *fiber.Ctx) error {
 	f := NewFileFromUser(file)
 	filePath := filepath.Join(files_folder, f.TimeName())
 	return c.SaveFile(file, filePath)
+}
+
+func updateTextFile(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
+	form := new(FileWithContent)
+	if err := parseValidate(form, c); err != nil {
+		return err
+	}
+	if int64(len(form.Content)) > app_config.UploadLimit*MB {
+		return fmt.Errorf("the file is too large (> %d MB)", app_config.UploadLimit)
+	}
+	fileName := NewFileWithName(form.Name).TimeName()
+	filePath := filepath.Join(files_folder, fileName)
+	return os.WriteFile(filePath, []byte(form.Content), 0666)
 }
 
 func allFiles() (files []*File, err error) {

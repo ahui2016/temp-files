@@ -21,6 +21,17 @@ type File struct {
 	IsText bool   // true if File.Name ends with ".txt" or ".md"
 }
 
+// NewFileWithName 主要是为了更方便使用 File.TimeName(),
+// 因此 Size 和 IsText 不重要。
+func NewFileWithName(name string) *File {
+	return &File{
+		CTime: time.Now().Unix(),
+		Name:  name,
+		// Size:  不重要
+		// IsText: 此时文件类型不重要
+	}
+}
+
 // NewFileFromUser 根据用户上传的文件解析出一个 File
 func NewFileFromUser(file *multipart.FileHeader) *File {
 	return &File{
@@ -66,6 +77,6 @@ type FilenameForm struct {
 }
 
 type FileWithContent struct {
-	Name    string `json:"name" form:"name"`
+	Name    string `json:"name" form:"name" validate:"required"`
 	Content string `json:"content" form:"content" validate:"required"`
 }

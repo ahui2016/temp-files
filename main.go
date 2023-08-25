@@ -21,6 +21,7 @@ func main() {
 	api.Post("/delete-file", deleteFile)
 	api.Post("/download-file", downloadFile)
 	api.Post("/get-file-by-prefix", getFileByPrefix)
+	api.Post("/update-text-file", updateTextFile)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

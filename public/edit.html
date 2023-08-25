@@ -39,6 +39,7 @@
   <p>
     <button type="submit" id="hidden-submit">submit</button>
     <button id="edit-submit">Submit</button>
+    <div id="submit-alert"></div>
   </p>
 </form>
 
@@ -55,6 +56,7 @@ const fileEditForm = $("#file-edit-form");
 const nameInput = $("#name-input");
 const contentsArea = $("#file-contents");
 const submitBtn = $("#edit-submit");
+const submitAlert = $("#submit-alert");
 
 init();
 
@@ -87,6 +89,28 @@ function loadFile(ctime) {
     }
   });
 }
+
+submitBtn.on("click", event => {
+  event.preventDefault();
+  const data = {
+    pwd: localStorage.getItem("pwd"),
+    name: nameInput.val().trim(),
+    content: contentsArea.val()
+  };
+  Util.disable(submitBtn);
+  Util.postJSON(data, {
+    url: "/api/update-text-file",
+    onSuccess: () => {
+      submitAlert.prepend( div(`${timeNow()} 成功更新檔案（同時產生一個新檔案）`) );
+    },
+    onError: (err) => {
+      submitAlert.prepend( div(`${timeNow()} ${err}`).css("color", "red") );
+    },
+    onAlways: () => {
+      Util.enable(submitBtn);
+    }
+  });
+});
 
 </script>
 </body>

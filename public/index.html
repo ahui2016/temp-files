@@ -184,7 +184,7 @@ function deleteFile(file, itemID) {
     url: "/api/delete-file",
     onSuccess: () => {
       itemStatus.html('').append(
-        span("DELETED").css({color:"white",backgroundColor:"red"})
+        span("DELETED").css({color:"white",backgroundColor:"grey"})
       );
       item.find(".item-buttons").hide();
     },
