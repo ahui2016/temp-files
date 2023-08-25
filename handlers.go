@@ -50,24 +50,16 @@ func downloadFile(c *fiber.Ctx) error {
 	return c.SendFile(filePath)
 }
 
-func getFileByPrefix(c *fiber.Ctx) error {
+func loadFileHandler(c *fiber.Ctx) error {
 	prefix, err := checkParseFilename(c)
 	if err != nil {
 		return err
 	}
-	pattern := filepath.Join(files_folder, prefix)
-	matches, err := filepath.Glob(pattern)
+	filePath, file, err := getFileByPrefix(prefix)
 	if err != nil {
 		return err
 	}
-	if len(matches) < 1 {
-		return fmt.Errorf("file not found: %s", prefix)
-	}
-	file, err := NewFileFromServer(matches[0])
-	if err != nil {
-		return err
-	}
-	content, err := os.ReadFile(matches[0])
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
@@ -75,6 +67,21 @@ func getFileByPrefix(c *fiber.Ctx) error {
 		Name:    file.Name,
 		Content: string(content),
 	})
+}
+
+func getFileByPrefix(prefix string) (filePath string, file *File, err error) {
+	pattern := filepath.Join(files_folder, prefix)
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return
+	}
+	if len(matches) < 1 {
+		err = fmt.Errorf("file not found: %s", prefix)
+		return
+	}
+	filePath = matches[0]
+	file, err = NewFileFromServer(filePath)
+	return
 }
 
 func checkParseFilename(c *fiber.Ctx) (filename string, err error) {
@@ -104,7 +111,7 @@ func uploadFileHandler(c *fiber.Ctx) error {
 	return c.SaveFile(file, filePath)
 }
 
-func updateTextFile(c *fiber.Ctx) error {
+func saveTextFile(c *fiber.Ctx) error {
 	if err := checkPassword(c); err != nil {
 		return err
 	}
@@ -119,6 +126,8 @@ func updateTextFile(c *fiber.Ctx) error {
 	filePath := filepath.Join(files_folder, fileName)
 	return os.WriteFile(filePath, []byte(form.Content), 0666)
 }
+
+func renameFile(c *fiber.Ctx) error {}
 
 func allFiles() (files []*File, err error) {
 	paths, err := filepath.Glob(files_folder + Separator + "*")

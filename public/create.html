@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Edit .. temp-files</title>
+  <title>New Text File .. temp-files</title>
 
   <link rel="stylesheet" href="/style.css">
   <script src="jquery.min.js"></script>
@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<h2>Edit (編輯檔案)</h2>
+<h2>New Text File (新建文字檔案)</h2>
 
 <div class="text-right">
   <a href="/">Files</a>
@@ -49,7 +49,6 @@ $("#hidden-submit").hide().on("click", event => {
   return false;
 });
 
-const fileCTime = getUrlParam("ctime");
 const pageAlert = $("#page-alert");
 const requiredLogin = $("#required-login");
 const fileEditForm = $("#file-edit-form");
@@ -58,37 +57,15 @@ const contentsArea = $("#file-contents");
 const submitBtn = $("#edit-submit");
 const submitAlert = $("#submit-alert");
 
+let is_new_file = true;
+const createSuccessMsg = "保存成功（創建了一個新的文字檔案）"
+const updateSuccessMsg = "成功更新檔案（同時產生一個新檔案）";
+
 init();
 
 function init() {
   requiredLogin.hide();
-  fileEditForm.hide();
-  if (!fileCTime) {
-    const err = "缺少 ctime 參數";
-    pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"))
-    return;
-  }
-  loadFile(fileCTime);
-}
-
-function loadFile(ctime) {
-  const data = {
-    filename: ctime + "-*",
-    pwd: localStorage.getItem("pwd"),
-  };
-  Util.postJSON(data, {
-    url: "/api/load-file-by-prefix",
-    onSuccess: async (resp) => {
-      const file = await resp.json();
-      fileEditForm.show();
-      nameInput.val(file.name)
-      contentsArea.val(file.content);
-      Util.focus(nameInput);
-    },
-    onError: (err) => {
-      pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"));
-    }
-  });
+  Util.focus(nameInput);
 }
 
 submitBtn.on("click", event => {
@@ -109,7 +86,9 @@ submitBtn.on("click", event => {
   Util.postJSON(data, {
     url: "/api/save-text-file",
     onSuccess: () => {
-      submitAlert.prepend( div(`${timeNow()} 成功更新檔案（同時產生一個新檔案）`) );
+      const successMsg = is_new_file ? createSuccessMsg : updateSuccessMsg;
+      submitAlert.prepend( div(`${timeNow()} ${successMsg}`) );
+      is_new_file = false;
     },
     onError: (err) => {
       submitAlert.prepend( div(`${timeNow()} ${err}`).css("color", "red") );

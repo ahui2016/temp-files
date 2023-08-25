@@ -20,8 +20,8 @@ func main() {
 	api.Post("/upload-file", uploadFileHandler)
 	api.Post("/delete-file", deleteFile)
 	api.Post("/download-file", downloadFile)
-	api.Post("/get-file-by-prefix", getFileByPrefix)
-	api.Post("/update-text-file", updateTextFile)
+	api.Post("/load-file-by-prefix", loadFileHandler)
+	api.Post("/save-text-file", saveTextFile)
 
 	log.Fatal(app.Listen(app_config.Host))
 }
