@@ -64,3 +64,8 @@ func (f *File) TimeName() string {
 type FilenameForm struct {
 	Filename string `json:"filename" form:"filename" validate:"required"`
 }
+
+type FileWithContent struct {
+	Name    string `json:"name" form:"name"`
+	Content string `json:"content" form:"content" validate:"required"`
+}

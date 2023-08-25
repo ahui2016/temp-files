@@ -168,3 +168,13 @@ function fileSizeToString(fileSize, fixed) {
   }
   return `${sizeGB.toFixed(fixed)} GB`;
 }
+
+/**
+ * 获取地址栏的参数。
+ * @param {string} name
+ * @returns {string | null}
+ */
+function getUrlParam(name) {
+  const queryString = new URLSearchParams(document.location.search);
+  return queryString.get(name);
+}

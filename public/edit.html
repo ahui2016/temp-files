@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Edit .. temp-files</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <script src="jquery.min.js"></script>
+  <script src="dayjs.min.js"></script>
+  <script src="util.js"></script>
+</head>
+<body>
+
+<h2>Edit (編輯檔案)</h2>
+
+<div class="text-right">
+  <a href="/">Files</a>
+</div>
+
+<div id="page-alert"></div>
+
+<div id="required-login">
+  <p>
+    <span>Required Login (請登入) =&gt;</span>
+    <a href="login.html">Login</a>
+  </p>
+</div>
+
+<form id="file-edit-form" autocomplete="off">
+  <p>
+    <label for="name-input">檔案名稱:</label>
+    <input type="text" name="name-input" id="name-input" size="50">
+  </p>
+  <p>
+    <textarea name="file-contents" id="file-contents" cols="60" rows="10"></textarea>
+  </p>
+  <p>
+    <button type="submit" id="hidden-submit">submit</button>
+    <button id="edit-submit">Submit</button>
+  </p>
+</form>
+
+<script>
+$("#hidden-submit").hide().on("click", event => {
+  event.preventDefault();
+  return false;
+});
+
+const fileCTime = getUrlParam("ctime");
+const pageAlert = $("#page-alert");
+const requiredLogin = $("#required-login");
+const fileEditForm = $("#file-edit-form");
+const nameInput = $("#name-input");
+const contentsArea = $("#file-contents");
+const submitBtn = $("#edit-submit");
+
+init();
+
+function init() {
+  requiredLogin.hide();
+  fileEditForm.hide();
+  if (!fileCTime) {
+    const err = "缺少 ctime 參數";
+    pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"))
+    return;
+  }
+  loadFile(fileCTime);
+}
+
+function loadFile(ctime) {
+  const data = {
+    filename: ctime + "-*",
+    pwd: localStorage.getItem("pwd"),
+  };
+  Util.postJSON(data, {
+    url: "/api/get-file-by-prefix",
+    onSuccess: async (resp) => {
+      const file = await resp.json();
+      fileEditForm.show();
+      nameInput.val(file.name)
+      contentsArea.val(file.content);
+    },
+    onError: (err) => {
+      pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"));
+    }
+  });
+}
+
+</script>
+</body>
+</html>

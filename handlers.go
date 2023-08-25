@@ -50,6 +50,33 @@ func downloadFile(c *fiber.Ctx) error {
 	return c.SendFile(filePath)
 }
 
+func getFileByPrefix(c *fiber.Ctx) error {
+	prefix, err := checkParseFilename(c)
+	if err != nil {
+		return err
+	}
+	pattern := filepath.Join(files_folder, prefix)
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return err
+	}
+	if len(matches) < 1 {
+		return fmt.Errorf("file not found: %s", prefix)
+	}
+	file, err := NewFileFromServer(matches[0])
+	if err != nil {
+		return err
+	}
+	content, err := os.ReadFile(matches[0])
+	if err != nil {
+		return err
+	}
+	return c.JSON(FileWithContent{
+		Name:    file.Name,
+		Content: string(content),
+	})
+}
+
 func checkParseFilename(c *fiber.Ctx) (filename string, err error) {
 	if err = checkPassword(c); err != nil {
 		return
