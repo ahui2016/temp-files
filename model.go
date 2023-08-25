@@ -60,3 +60,7 @@ func splitTimeName(timeName string) (time int64, name string, err error) {
 func (f *File) TimeName() string {
 	return strconv.FormatInt(f.CTime, 10) + "-" + f.Name
 }
+
+type FilenameForm struct {
+	Filename string `json:"filename" form:"filename" validate:"required"`
+}

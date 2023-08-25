@@ -19,6 +19,7 @@ func main() {
 	api.Post("/files", getFileList)
 	api.Post("/upload-file", uploadFileHandler)
 	api.Post("/delete-file", deleteFile)
+	api.Post("/download-file", downloadFile)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

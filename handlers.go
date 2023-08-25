@@ -33,18 +33,32 @@ func getFileList(c *fiber.Ctx) error {
 }
 
 func deleteFile(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
+	filename, err := checkParseFilename(c)
+	if err != nil {
 		return err
 	}
-	type Form struct {
-		Filename string `json:"filename" form:"filename" validate:"required"`
-	}
-	form := new(Form)
-	if err := parseValidate(form, c); err != nil {
-		return err
-	}
-	filePath := filepath.Join(files_folder, form.Filename)
+	filePath := filepath.Join(files_folder, filename)
 	return os.Remove(filePath)
+}
+
+func downloadFile(c *fiber.Ctx) error {
+	filename, err := checkParseFilename(c)
+	if err != nil {
+		return err
+	}
+	filePath := filepath.Join(files_folder, filename)
+	return c.SendFile(filePath)
+}
+
+func checkParseFilename(c *fiber.Ctx) (filename string, err error) {
+	if err = checkPassword(c); err != nil {
+		return
+	}
+	form := new(FilenameForm)
+	if err = parseValidate(form, c); err != nil {
+		return
+	}
+	return form.Filename, nil
 }
 
 func uploadFileHandler(c *fiber.Ctx) error {

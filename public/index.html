@@ -37,6 +37,7 @@
     <div>
       <span class="datetime mr-1"></span>
       <span class="filesize mr-2"></span>
+      <a href="#" class="item-buttons dl-btn mr-1">download</a>
       <a href="#" class="item-buttons toggle-del-btn mr-1">del</a>
       <a href="#" class="item-buttons del-btn mr-1">delete</a>
     </div>
@@ -91,6 +92,12 @@ function newFileItem(file) {
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
 
+  const downloadBtn = item.querySelector(".dl-btn");
+  downloadBtn.addEventListener("click", event => {
+    event.preventDefault();
+    downloadFile(file, itemID);
+  });
+
   const toggleBtn = item.querySelector(".toggle-del-btn");
   toggleBtn.addEventListener("click", event => {
     event.preventDefault();
@@ -107,15 +114,49 @@ function newFileItem(file) {
   return item;
 }
 
+function downloadFile(file, itemID) {
+  const item = $("#"+itemID);
+  const itemStatus = item.find(".item-status");
+  const btn = item.find(".dl-btn");
+  const data = {
+    filename: `${file.CTime}-${file.Name}`,
+    pwd: localStorage.getItem("pwd"),
+  };
+
+  Util.disable(btn);
+  Util.postJSON(data, {
+    url: "/api/download-file",
+    onSuccess: async (resp) => {
+      const blob = await resp.blob();
+      downloadBlob(blob, file.Name);
+    },
+    onError: (err) => {
+      itemStatus.prepend(div(`${timeNow()} ${err}`).css("color", "red"));
+    },
+    onAlways: () => {
+      Util.enable(btn);
+    }
+  });
+}
+
+// https://stackoverflow.com/questions/4545311/download-a-file-by-jquery-ajax
+function downloadBlob(blob, filename) {
+  const url = window.URL.createObjectURL(blob);
+  const a = ce("a").attr({href:url,download:filename}).hide();
+  $("body").append(a);
+  a[0].click();
+  window.URL.revokeObjectURL(url);
+}
+
 function toggleDelBtn(itemID) {
   const item = $("#"+itemID);
   const itemStatus = item.find(".item-status");
   const toggleBtn = item.find(".toggle-del-btn");
   const delBtn = item.find(".del-btn");
   Util.disable(toggleBtn);
-  itemStatus
-    .text("點擊紅色的 delete 按鈕徹底刪除檔案，不可恢復。")
-    .css("color", "blue");
+  itemStatus.prepend(
+    div("點擊紅色的 delete 按鈕徹底刪除檔案，不可恢復。").css("color", "blue")
+  );
   toggleBtn.fadeOut(2000, () => {
     delBtn.show();
   });
@@ -140,7 +181,7 @@ function deleteFile(file, itemID) {
       item.find(".item-buttons").hide();
     },
     onError: (err) => {
-      itemStatus.text(`${timeNow()} ${err}`).css("color", "red");
+      itemStatus.prepend(div(`${timeNow()} ${err}`).css("color", "red"));
     },
     onAlways: () => {
       Util.enable(btn);

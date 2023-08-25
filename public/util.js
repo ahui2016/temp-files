@@ -58,6 +58,16 @@ function p(text) {
   return ce("p");
 }
 
+/**
+ * jElem is a string or JQuery<HTMLElement>
+ */
+function div(jElem) {
+  if (typeof jElem == "string") {
+    return ce("div").text(jElem);
+  }
+  return ce("div").append(jElem);
+}
+
 function timeNow() {
   return dayjs().format("HH:mm:ss");
 }
