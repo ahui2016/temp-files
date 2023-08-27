@@ -80,8 +80,3 @@ type FileWithContent struct {
 	Name    string `json:"name" form:"name" validate:"required"`
 	Content string `json:"content" form:"content"`
 }
-
-type RenameFileForm struct {
-	Prefix string `json:"prefix" form:"prefix" validate:"required"`
-	Name   string `json:"name" form:"name" validate:"required"`
-}

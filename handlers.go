@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -122,12 +123,14 @@ func saveTextFile(c *fiber.Ctx) error {
 	if int64(len(form.Content)) > app_config.UploadLimit*MB {
 		return fmt.Errorf("the file is too large (> %d MB)", app_config.UploadLimit)
 	}
-	fileName := NewFileWithName(form.Name).TimeName()
-	filePath := filepath.Join(files_folder, fileName)
+	file := NewFileWithName(form.Name)
+	if !strings.Contains(file.Name, ".") {
+		// 如果忘记写后缀名，就自动添加。
+		file.Name += ".txt"
+	}
+	filePath := filepath.Join(files_folder, file.TimeName())
 	return os.WriteFile(filePath, []byte(form.Content), 0666)
 }
-
-func renameFile(c *fiber.Ctx) error {}
 
 func allFiles() (files []*File, err error) {
 	paths, err := filepath.Glob(files_folder + Separator + "*")
