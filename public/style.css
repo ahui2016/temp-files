@@ -7,6 +7,10 @@ footer a {
     color: inherit;
 }
 
+.item-buttons {
+    color: green
+}
+
 .text-center {
     text-align: center;
 }
