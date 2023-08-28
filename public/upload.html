@@ -21,7 +21,7 @@
 
 <div id="page-alert"></div>
 
-<div id="required-login">
+<div id="required-login" style="display: none;">
   <p>
     <span>Required Login (請登入) =&gt;</span>
     <a href="login.html">Login</a>
@@ -66,13 +66,11 @@ function init() {
 
 function checkPwd() {
   Util.checkPwd({
-    onSuccess: () => {
-      requiredLogin.hide();
-    },
     onError: (err) => {
       pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
       fileInput.style.display = "none";
       checkFileArea.hide();
+      requiredLogin.show();
     }
   });
 }

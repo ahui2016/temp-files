@@ -21,7 +21,7 @@
 
 <div id="page-alert"></div>
 
-<div id="required-login">
+<div id="required-login" style="display: none;">
   <p>
     <span>Required Login (請登入) =&gt;</span>
     <a href="login.html">Login</a>
@@ -61,7 +61,6 @@ const submitAlert = $("#submit-alert");
 init();
 
 function init() {
-  requiredLogin.hide();
   fileEditForm.hide();
   if (!fileCTime) {
     const err = "缺少 ctime 參數";
