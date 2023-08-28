@@ -64,8 +64,20 @@ const updateSuccessMsg = "成功更新檔案（同時產生一個新檔案）";
 init();
 
 function init() {
-  requiredLogin.hide();
-  Util.focus(nameInput);
+  checkPwd();
+}
+
+function checkPwd() {
+  Util.checkPwd({
+    onSuccess: () => {
+      requiredLogin.hide();
+      Util.focus(nameInput);
+    },
+    onError: (err) => {
+      pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
+      fileEditForm.hide();
+    }
+  });
 }
 
 submitBtn.on("click", event => {

@@ -61,15 +61,16 @@ init();
 function init() {
   checkPwd();
   uploadBtn.hide();
-  requiredLogin.hide();
   uploadStatusArea.hide();
 }
 
 function checkPwd() {
   Util.checkPwd({
+    onSuccess: () => {
+      requiredLogin.hide();
+    },
     onError: (err) => {
       pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
-      requiredLogin.show();
       fileInput.style.display = "none";
       checkFileArea.hide();
     }

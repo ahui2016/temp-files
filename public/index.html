@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<h2>All Files</h2>
+<h2>All Files <span id="total-size"></span></h2>
 
 <div class="text-right">
   <a href="create.html">New</a> |
@@ -48,6 +48,7 @@
 </template>
 
 <script>
+const totalSize = $('#total-size');
 const pageAlert = $('#page-alert');
 const requiredLogin = $('#required-login');
 const fileList = raw('#file-list');
@@ -78,9 +79,12 @@ async function loadFiles() {
 }
 
 function appendFiles(files) {
+  let size = 0;
   files.forEach(file => {
     fileList.appendChild(newFileItem(file));
+    size += file.Size;
   });
+  totalSize.text(`(${fileSizeToString(size)})`);
 }
 
 function newFileItem(file) {
