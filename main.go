@@ -11,6 +11,8 @@ func main() {
 		Immutable: true, // 以后试试删除该设定
 	})
 
+	app.Use(noCache)
+
 	app.Static("/", public_folder)
 
 	api := app.Group("/api")

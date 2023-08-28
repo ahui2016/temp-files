@@ -82,7 +82,13 @@ function loadFile(ctime) {
       const file = await resp.json();
       fileEditForm.show();
       nameInput.val(file.name)
-      contentsArea.val(file.content);
+      if (file.isText) {
+        contentsArea.val(file.content);
+      } else {
+        fileEditForm.hide();
+        pageAlert.append(div(`檔案名稱: ${file.name}`));
+        pageAlert.append(div(`${timeNow()} 不支持編輯該檔案格式`).css("color", "red"));
+      }
       Util.focus(nameInput);
     },
     onError: (err) => {

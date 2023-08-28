@@ -78,5 +78,14 @@ type FilenameForm struct {
 
 type FileWithContent struct {
 	Name    string `json:"name" form:"name" validate:"required"`
+	IsText  bool   `json:"isText" form:"isText"`
 	Content string `json:"content" form:"content"`
+}
+
+func NewFileWithContent(name string) *FileWithContent {
+	file := &FileWithContent{Name: name}
+	if strings.HasSuffix(name, ".txt") || strings.HasSuffix(name, ".md") {
+		file.IsText = true
+	}
+	return file
 }

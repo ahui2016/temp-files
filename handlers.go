@@ -56,18 +56,19 @@ func loadFileHandler(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	filePath, file, err := getFileByPrefix(prefix)
+	filePath, f, err := getFileByPrefix(prefix)
 	if err != nil {
 		return err
 	}
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return err
+	file := NewFileWithContent(f.Name)
+	if file.IsText {
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			return err
+		}
+		file.Content = string(content)
 	}
-	return c.JSON(FileWithContent{
-		Name:    file.Name,
-		Content: string(content),
-	})
+	return c.JSON(file)
 }
 
 func getFileByPrefix(prefix string) (filePath string, file *File, err error) {
