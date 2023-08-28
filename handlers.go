@@ -21,7 +21,7 @@ func noCache(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-func getFileList(c *fiber.Ctx) error {
+func getAllFiles(c *fiber.Ctx) error {
 	if err := checkPassword(c); err != nil {
 		return err
 	}
@@ -30,6 +30,17 @@ func getFileList(c *fiber.Ctx) error {
 		return err
 	}
 	slices.Reverse(files)
+	return c.JSON(files)
+}
+
+func getRecentFiles(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
+	files, err := recentFiles()
+	if err != nil {
+		return err
+	}
 	return c.JSON(files)
 }
 
@@ -133,11 +144,26 @@ func saveTextFile(c *fiber.Ctx) error {
 	return os.WriteFile(filePath, []byte(form.Content), 0666)
 }
 
-func allFiles() (files []*File, err error) {
+func allFiles() ([]*File, error) {
 	paths, err := filepath.Glob(files_folder + Separator + "*")
 	if err != nil {
 		return nil, err
 	}
+	return pathsToFiles(paths)
+}
+
+func recentFiles() ([]*File, error) {
+	paths, err := filepath.Glob(files_folder + Separator + "*")
+	if err != nil {
+		return nil, err
+	}
+	if int64(len(paths)) > app_config.RecentFilesLimit {
+		paths = paths[:app_config.RecentFilesLimit]
+	}
+	return pathsToFiles(paths)
+}
+
+func pathsToFiles(paths []string) (files []*File, err error) {
 	for _, filePath := range paths {
 		f, err := NewFileFromServer(filePath)
 		if err != nil {

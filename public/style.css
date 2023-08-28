@@ -1,3 +1,11 @@
+footer {
+    font-size: small;
+    text-align: center;
+}
+
+footer a {
+    color: inherit;
+}
 
 .text-center {
     text-align: center;
@@ -11,7 +19,17 @@
 .font-bold {
     font-weight: bold;
 }
-  
+
+.mt-3 {
+    margin-top: 1rem;
+}
+.mt-4 {
+    margin-top: 2rem;
+}
+.mt-5 {
+    margin-top: 3rem;
+}
+
 .mb-0 {
     margin-bottom: 0;
 }

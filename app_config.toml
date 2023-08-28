@@ -5,3 +5,6 @@ UploadLimit = 50
 
 # 明文密码
 Password = 'abcd'
+
+# 最近檔案數量（第一頁檔案數量上限）
+RecentFilesLimit = 100

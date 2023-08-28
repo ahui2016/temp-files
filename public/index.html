@@ -13,9 +13,13 @@
 </head>
 <body>
 
-<h2>All Files <span id="total-size"></span></h2>
+<h2>
+  <span id="page-title">Files</span>
+  <span id="total-size"></span>
+</h2>
 
 <div class="text-right">
+  <a href="#" id="all-or-recent">Files</a> |
   <a href="create.html">New</a> |
   <a href="upload.html">Upload</a> |
   <a href="login.html">Logout</a>
@@ -23,14 +27,21 @@
 
 <div id="page-alert"></div>
 
-<div id="required-login">
+<div id="required-login" style="display: none;">
   <p>
     <span>Required Login (請登入) =&gt;</span>
     <a href="login.html">Login</a>
   </p>
 </div>
 
-<div id="file-list"></div>
+<div id="file-list" class="mt-4 mb-5"></div>
+
+<footer class="mt-5 mb-3">
+  GitHub Repository:
+  <a href="https://github.com/ahui2016/temp-files" target="_blank">
+    github.com/ahui2016/temp-files
+  </a>
+</footer>
 
 <template id="file-item">
   <div class="FileItem mb-3">
@@ -47,24 +58,40 @@
   </div>
 </template>
 
+
 <script>
+const pageTitle = $('#page-title');
 const totalSize = $('#total-size');
+const allOrRecent = $('#all-or-recent');
 const pageAlert = $('#page-alert');
 const requiredLogin = $('#required-login');
 const fileList = raw('#file-list');
 const fileItemTmpl = raw('#file-item');
 
+const is_all = getUrlParam("all");
+const files_url = is_all ? "/api/all-files" : "/api/recent-files";
+
 init();
 
 function init() {
-  requiredLogin.hide();
+  setHomeLink()
   loadFiles();
+}
+
+function setHomeLink() {
+  if (is_all) {
+    pageTitle.text("All Files");
+    allOrRecent.text("Recent Files").attr({href: "/"})
+  } else {
+    pageTitle.text("Recent Files");
+    allOrRecent.text("All Files").attr({href: "/?all=1"})
+  }
 }
 
 async function loadFiles() {
   const data = {pwd: localStorage.getItem("pwd")};
   Util.postJSON(data, {
-    url: "/api/files",
+    url: files_url,
     onSuccess: async (resp) => {
       const files = await resp.json();
       appendFiles(files);
@@ -78,13 +105,15 @@ async function loadFiles() {
   });
 }
 
-function appendFiles(files) {
+function appendFiles(files, url) {
   let size = 0;
   files.forEach(file => {
     fileList.appendChild(newFileItem(file));
     size += file.Size;
   });
-  totalSize.text(`(${fileSizeToString(size)})`);
+  if (is_all) {
+    totalSize.text(`(${fileSizeToString(size)})`);
+  }
 }
 
 function newFileItem(file) {
