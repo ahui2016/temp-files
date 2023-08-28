@@ -65,6 +65,7 @@ const totalSize = $('#total-size');
 const allOrRecent = $('#all-or-recent');
 const pageAlert = $('#page-alert');
 const requiredLogin = $('#required-login');
+const footer = $('footer');
 const fileList = raw('#file-list');
 const fileItemTmpl = raw('#file-item');
 
@@ -74,6 +75,7 @@ const files_url = is_all ? "/api/all-files" : "/api/recent-files";
 init();
 
 function init() {
+  footer.hide();
   setHomeLink()
   loadFiles();
 }
@@ -94,6 +96,9 @@ async function loadFiles() {
     url: files_url,
     onSuccess: async (resp) => {
       const files = await resp.json();
+      if (files.length > 10) {
+        footer.show();
+      }
       appendFiles(files);
     },
     onError: (err) => {

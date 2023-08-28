@@ -29,7 +29,6 @@ func getAllFiles(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	slices.Reverse(files)
 	return c.JSON(files)
 }
 
@@ -41,6 +40,7 @@ func getRecentFiles(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	slices.Reverse(files)
 	return c.JSON(files)
 }
 
