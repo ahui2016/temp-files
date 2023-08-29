@@ -31,7 +31,8 @@
 <form id="file-edit-form" autocomplete="off">
   <p>
     <label for="name-input">檔案名稱:</label>
-    <input type="text" name="name-input" id="name-input" size="50">
+    <textarea name="name-input" id="name-input" cols="50" rows="2" style="vertical-align: top;"></textarea>
+    <!-- <input type="text" name="name-input" id="name-input" size="50"> -->
   </p>
   <p>
     <textarea name="file-contents" id="file-contents" cols="60" rows="10"></textarea>
@@ -98,7 +99,7 @@ function loadFile(ctime) {
 
 submitBtn.on("click", event => {
   event.preventDefault();
-  const filename = nameInput.val().trim();
+  const filename = nameInput.val().replaceAll("\n", " ").trim();
   if (!filename) {
     submitAlert.prepend(
       div(`${timeNow()} Required Filename (請填寫當案名稱)`)
