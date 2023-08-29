@@ -99,6 +99,7 @@ submitBtn.on("click", event => {
   Util.postJSON(data, {
     url: "/api/save-text-file",
     onSuccess: () => {
+      $("tilte").text(nameInput.val());
       const successMsg = is_new_file ? createSuccessMsg : updateSuccessMsg;
       submitAlert.prepend( div(`${timeNow()} ${successMsg}`) );
       is_new_file = false;

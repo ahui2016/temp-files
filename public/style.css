@@ -8,7 +8,10 @@ footer a {
 }
 
 .item-buttons {
-    color: green
+    color: gray;
+}
+.item-buttons:hover {
+    color: blue;
 }
 
 .text-center {

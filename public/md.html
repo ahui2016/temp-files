@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Preview .. temp-files</title>
+
+  <link rel="stylesheet" href="simple.min.css" />
+  <script src="purify.min.js"></script>
+  <script src="marked.min.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="dayjs.min.js"></script>
+  <script src="util.js"></script>
+  <style>
+    code {
+      background-color: linen;
+    }
+    #alert {
+      color: red;
+      margin-top: 100px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-alert"></div>
+
+<div id="required-login" style="display: none;">
+  <p>
+    <span>Required Login (請登入) =&gt;</span>
+    <a href="login.html">Login</a>
+  </p>
+</div>
+
+<main></main>
+
+<script>
+
+const fileCTime = getUrlParam("ctime");
+const pageAlert = $("#page-alert");
+const requiredLogin = $("#required-login");
+
+init();
+
+function init() {
+  if (!fileCTime) {
+    const err = "缺少 ctime 參數";
+    pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"))
+    return;
+  }
+  loadFile(fileCTime);
+}
+
+function loadFile(ctime) {
+  const data = {
+    filename: ctime + "-*",
+    pwd: localStorage.getItem("pwd"),
+  };
+  Util.postJSON(data, {
+    url: "/api/load-file-by-prefix",
+    onSuccess: async (resp) => {
+      const file = await resp.json();
+      $("title").text(file.name);
+      const dirty = marked.parse(file.content);
+      const clean = DOMPurify.sanitize(dirty);
+      $("main").html(clean);
+    },
+    onError: (err) => {
+      pageAlert.append(div(`${timeNow()} ${err}`).css("color", "red"));
+    }
+  });
+}
+
+</script>
+</body>
+</html>

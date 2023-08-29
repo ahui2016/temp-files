@@ -49,6 +49,7 @@
     <div>
       <span class="datetime mr-1"></span>
       <span class="filesize mr-2"></span>
+      <a href="#" class="item-buttons view-btn mr-1">view</a>
       <a href="#" class="item-buttons edit-btn mr-1">edit</a>
       <a href="#" class="item-buttons dl-btn mr-1">download</a>
       <a href="#" class="item-buttons toggle-del-btn mr-1">del</a>
@@ -131,6 +132,13 @@ function newFileItem(file) {
   datetime.textContent = dayjs.unix(file.CTime).format(DATE_TIME_FORMAT);
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
+
+  const viewBtn = item.querySelector(".view-btn");
+  if (file.Name.toLowerCase().endsWith(".md")) {
+    viewBtn.href = `md.html?ctime=${file.CTime}`;
+  } else {
+    viewBtn.style.display = "none";
+  }
 
   const editBtn = item.querySelector(".edit-btn");
   if (file.IsText) {
