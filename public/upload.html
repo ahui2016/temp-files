@@ -46,6 +46,9 @@
 </p>
 
 <script>
+const MB = 1024 * 1024;
+let FileSizeLimit = 10*MB;
+
 const pageAlert = $("#page-alert");
 const requiredLogin = $('#required-login');
 const fileInput = raw('#file');
@@ -92,6 +95,12 @@ checkFileBtn.on('click', event => {
       span(`File Name: ${file.name}`), br(),
       span(`File Size: ${fileSizeToString(file.size)}`)
     ));
+    if (file.size > FileSizeLimit) {
+      checkFileAlert.append(
+        p("檔案體積太大，超過上限。").css("color", "red")
+      );
+      return false;
+    }
     uploadBtn.show();
   } else {
     checkFileAlert.append(p("no file chosen"));
