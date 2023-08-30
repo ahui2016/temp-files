@@ -13,6 +13,13 @@ footer a {
 .item-buttons:hover {
     color: blue;
 }
+.del-btn {
+    color: red;
+}
+.del-btn:hover {
+    color: red;
+    font-weight: bold;
+}
 
 .text-center {
     text-align: center;
@@ -67,8 +74,4 @@ footer a {
 }
 .mr-3 {
     margin-right: 1rem;
-}
-
-.del-btn {
-    color: red;
 }
