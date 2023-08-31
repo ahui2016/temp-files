@@ -126,6 +126,7 @@ uploadBtn.on('click', event => {
     body: formData,
   }
 
+  Util.disable(checkFileBtn);
   Util.disable(uploadBtn);
   Util.fetch({
     url: "/api/upload-file",
@@ -133,9 +134,9 @@ uploadBtn.on('click', event => {
     onSuccess: () => {
       uploadStatus.text(`${timeNow()} Successfully uploaded.`).css("color", "blue");
       Util.disable($(fileInput));
-      Util.disable(checkFileBtn);
     },
     onError: (err) => {
+      Util.enable(checkFileBtn);
       Util.enable(uploadBtn);
       uploadStatus.text(`${timeNow()} ${err}`).css("color", "red");
     }
