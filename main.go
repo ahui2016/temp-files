@@ -9,6 +9,7 @@ import (
 func main() {
 	app := fiber.New(fiber.Config{
 		Immutable: true, // 以后试试删除该设定
+		BodyLimit: int(app_config.UploadLimit) * MB,
 	})
 
 	app.Use(noCache)
