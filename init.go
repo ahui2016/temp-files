@@ -15,20 +15,22 @@ const (
 )
 
 const (
-	AppConfigTOML        = "app_config.toml"
-	AppConfigDefaultTOML = "app_config_default.toml"
-	PublicFolderName     = "public"
-	FilesFolderName      = "files"
+	AppConfigTOML          = "app_config.toml"
+	AppConfigDefaultTOML   = "app_config_default.toml"
+	PublicFolderName       = "public"
+	FilesFolderName        = "files"
+	OldTextFilesFolderName = "old"
 )
 
 var (
-	Separator            = string(filepath.Separator)
-	app_root             = filepath.Dir(executable())
-	app_config           *AppConfig
-	app_config_path      = filepath.Join(app_root, AppConfigTOML)
-	app_cfg_default_path = filepath.Join(app_root, AppConfigDefaultTOML)
-	public_folder        = filepath.Join(app_root, PublicFolderName)
-	files_folder         = filepath.Join(app_root, FilesFolderName)
+	Separator             = string(filepath.Separator)
+	app_root              = filepath.Dir(executable())
+	app_config            *AppConfig
+	app_config_path       = filepath.Join(app_root, AppConfigTOML)
+	app_cfg_default_path  = filepath.Join(app_root, AppConfigDefaultTOML)
+	public_folder         = filepath.Join(app_root, PublicFolderName)
+	files_folder          = filepath.Join(app_root, FilesFolderName)
+	old_text_files_folder = filepath.Join(app_root, OldTextFilesFolderName)
 )
 
 func init() {

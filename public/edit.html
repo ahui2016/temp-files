@@ -50,7 +50,8 @@ $("#hidden-submit").hide().on("click", event => {
   return false;
 });
 
-const fileCTime = getUrlParam("ctime");
+let fileCTime = getUrlParam("ctime");
+
 const pageAlert = $("#page-alert");
 const requiredLogin = $("#required-login");
 const fileEditForm = $("#file-edit-form");
@@ -109,15 +110,18 @@ submitBtn.on("click", event => {
   }
   const data = {
     pwd: localStorage.getItem("pwd"),
+    ctime: fileCTime,
     name: filename,
     content: contentsArea.val()
   };
   Util.disable(submitBtn);
   Util.postJSON(data, {
     url: "/api/save-text-file",
-    onSuccess: () => {
+    onSuccess: async (resp) => {
+      const msg = await resp.json();
+      fileCTime = msg.text;
       $("tilte").text(nameInput.val());
-      submitAlert.prepend( div(`${timeNow()} 成功更新檔案（同時產生一個新檔案）`) );
+      submitAlert.prepend( div(`${timeNow()} 成功更新檔案`) );
     },
     onError: (err) => {
       submitAlert.prepend( div(`${timeNow()} ${err}`).css("color", "red") );

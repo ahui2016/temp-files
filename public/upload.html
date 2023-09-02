@@ -116,8 +116,6 @@ uploadBtn.on('click', event => {
 
   const file = fileInput.files[0];
 
-  // TODO: check file size
-
   const formData = new FormData();
   formData.append("file", file);
   formData.append("pwd", localStorage.getItem("pwd"));

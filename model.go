@@ -78,6 +78,7 @@ type FilenameForm struct {
 }
 
 type FileWithContent struct {
+	CTime   string `json:"ctime" form:"ctime"`
 	Name    string `json:"name" form:"name" validate:"required"`
 	IsText  bool   `json:"isText" form:"isText"`
 	Content string `json:"content" form:"content"`

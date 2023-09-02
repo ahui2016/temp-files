@@ -5,11 +5,17 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
+
+// TextMsg 用于向前端返回一个简单的文本消息。
+type TextMsg struct {
+	Text string `json:"text"`
+}
 
 var validate = validator.New()
 
@@ -141,7 +147,25 @@ func saveTextFile(c *fiber.Ctx) error {
 		file.Name += ".txt"
 	}
 	filePath := filepath.Join(files_folder, file.TimeName())
-	return os.WriteFile(filePath, []byte(form.Content), 0666)
+	if err := os.WriteFile(filePath, []byte(form.Content), 0666); err != nil {
+		return err
+	}
+	if err := moveOldTextFile(form.CTime); err != nil {
+		return err
+	}
+	return c.JSON(TextMsg{strconv.FormatInt(file.CTime, 10)})
+}
+
+func moveOldTextFile(ctime string) error {
+	if ctime == "" {
+		return nil
+	}
+	oldpath, file, err := getFileByPrefix(ctime + "-*")
+	if err != nil {
+		return err
+	}
+	newpath := filepath.Join(old_text_files_folder, file.TimeName())
+	return os.Rename(oldpath, newpath)
 }
 
 func allFiles() ([]*File, error) {
