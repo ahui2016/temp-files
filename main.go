@@ -21,6 +21,7 @@ func main() {
 	api.Post("/check-pwd", checkPassword)
 	api.Post("/all-files", getAllFiles)
 	api.Post("/recent-files", getRecentFiles)
+	api.Post("/old-text-files", getOldTextFiles)
 	api.Post("/upload-file", uploadFileHandler)
 	api.Post("/delete-file", deleteFile)
 	api.Post("/download-file", downloadFile)

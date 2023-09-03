@@ -36,7 +36,7 @@
 
 <div id="file-list" class="mt-4 mb-5"></div>
 
-<footer class="mt-5 mb-3">
+<footer class="mt-6 mb-3">
   GitHub Repository:
   <a href="https://github.com/ahui2016/temp-files" target="_blank">
     github.com/ahui2016/temp-files
@@ -70,8 +70,9 @@ const footer = $('footer');
 const fileList = raw('#file-list');
 const fileItemTmpl = raw('#file-item');
 
+const is_old = getUrlParam("old");
 const is_all = getUrlParam("all");
-const files_url = is_all ? "/api/all-files" : "/api/recent-files";
+let files_url;
 
 init();
 
@@ -82,10 +83,16 @@ function init() {
 }
 
 function setHomeLink() {
-  if (is_all) {
+  if (is_old) {
+    files_url = "/api/old-text-files";
+    pageTitle.text("Old Text Files");
+    allOrRecent.text("Recent Files").attr({href: "/"})
+  } else if (is_all) {
+    files_url = "/api/all-files";
     pageTitle.text("All Files");
     allOrRecent.text("Recent Files").attr({href: "/"})
   } else {
+    files_url = "/api/recent-files";
     pageTitle.text("Recent Files");
     allOrRecent.text("All Files").attr({href: "/?all=1"})
   }
@@ -97,6 +104,12 @@ async function loadFiles() {
     url: files_url,
     onSuccess: async (resp) => {
       const files = await resp.json();
+      if (!files || files.length == 0) {
+        pageAlert.append(
+          p(`${timeNow()} 空空如也`).css("color", "blue")
+        );
+        return;
+      }
       if (files.length > 10) {
         footer.show();
       }
@@ -135,36 +148,51 @@ function newFileItem(file) {
 
   const viewBtn = item.querySelector(".view-btn");
   if (file.Name.toLowerCase().endsWith(".md")) {
-    viewBtn.href = `md.html?ctime=${file.CTime}`;
+    if (is_old) {
+      viewBtn.href = `md.html?old=1&ctime=${file.CTime}`;
+    } else {
+      viewBtn.href = `md.html?ctime=${file.CTime}`;
+    }
   } else {
     viewBtn.style.display = "none";
   }
 
   const editBtn = item.querySelector(".edit-btn");
   if (file.IsText) {
-    editBtn.href = `edit.html?ctime=${file.CTime}`;
+    if (is_old) {
+      editBtn.href = `edit.html?old=1&ctime=${file.CTime}`;
+    } else {
+      editBtn.href = `edit.html?ctime=${file.CTime}`;
+    }
   } else {
     editBtn.style.display = "none";
   }
 
   const downloadBtn = item.querySelector(".dl-btn");
-  downloadBtn.addEventListener("click", event => {
-    event.preventDefault();
-    downloadFile(file, itemID);
-  });
+  if (is_old) {
+    downloadBtn.style.display = "none";
+  } else {
+    downloadBtn.addEventListener("click", event => {
+      event.preventDefault();
+      downloadFile(file, itemID);
+    });
+  }
 
   const toggleBtn = item.querySelector(".toggle-del-btn");
-  toggleBtn.addEventListener("click", event => {
-    event.preventDefault();
-    toggleDelBtn(itemID);
-  });
-
   const delBtn = item.querySelector(".del-btn");
   delBtn.style.display = "none";
-  delBtn.addEventListener("click", event => {
-    event.preventDefault();
-    deleteFile(file, itemID);
-  });
+  if (is_old) {
+    toggleBtn.style.display = "none";
+  } else {
+    toggleBtn.addEventListener("click", event => {
+      event.preventDefault();
+      toggleDelBtn(itemID);
+    });
+    delBtn.addEventListener("click", event => {
+      event.preventDefault();
+      deleteFile(file, itemID);
+    });
+  }
 
   return item;
 }
@@ -242,6 +270,10 @@ function deleteFile(file, itemID) {
       Util.enable(btn);
     }
   });
+}
+
+function gotoOld() {
+  window.location.href = "/?old=1";
 }
 
 </script>

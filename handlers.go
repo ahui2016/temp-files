@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 )
 
 // TextMsg 用于向前端返回一个简单的文本消息。
@@ -31,10 +32,22 @@ func getAllFiles(c *fiber.Ctx) error {
 	if err := checkPassword(c); err != nil {
 		return err
 	}
-	files, err := allFiles()
+	files, err := allFiles("")
 	if err != nil {
 		return err
 	}
+	return c.JSON(files)
+}
+
+func getOldTextFiles(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
+	files, err := allFiles("old")
+	if err != nil {
+		return err
+	}
+	slices.Reverse(files)
 	return c.JSON(files)
 }
 
@@ -42,7 +55,7 @@ func getRecentFiles(c *fiber.Ctx) error {
 	if err := checkPassword(c); err != nil {
 		return err
 	}
-	files, err := recentFiles()
+	files, err := allFiles("recent")
 	if err != nil {
 		return err
 	}
@@ -168,21 +181,19 @@ func moveOldTextFile(ctime string) error {
 	return os.Rename(oldpath, newpath)
 }
 
-func allFiles() ([]*File, error) {
-	paths, err := filepath.Glob(files_folder + Separator + "*")
+func allFiles(filter string) ([]*File, error) {
+	folder := lo.Ternary(filter == "old", old_text_files_folder, files_folder)
+	paths, err := filepath.Glob(folder + Separator + "*")
 	if err != nil {
 		return nil, err
 	}
-	return pathsToFiles(paths)
-}
-
-func recentFiles() ([]*File, error) {
-	paths, err := filepath.Glob(files_folder + Separator + "*")
-	if err != nil {
-		return nil, err
+	if filter == "recent" {
+		if int64(len(paths)) > app_config.RecentFilesLimit {
+			paths = paths[:app_config.RecentFilesLimit]
+		}
 	}
-	if int64(len(paths)) > app_config.RecentFilesLimit {
-		paths = paths[:app_config.RecentFilesLimit]
+	if len(paths) == 0 {
+		return nil, nil
 	}
 	return pathsToFiles(paths)
 }
