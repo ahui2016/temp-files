@@ -51,6 +51,7 @@ $("#hidden-submit").hide().on("click", event => {
 });
 
 let fileCTime = getUrlParam("ctime");
+const is_old = getUrlParam("old");
 
 const pageAlert = $("#page-alert");
 const requiredLogin = $("#required-login");
@@ -74,7 +75,8 @@ function init() {
 
 function loadFile(ctime) {
   const data = {
-    filename: ctime + "-*",
+    prefix: ctime + "-*",
+    old: !!is_old,
     pwd: localStorage.getItem("pwd"),
   };
   Util.postJSON(data, {

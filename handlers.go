@@ -95,29 +95,34 @@ func getTotalSize(c *fiber.Ctx) error {
 }
 
 func deleteFile(c *fiber.Ctx) error {
-	filename, err := checkParseFilename(c)
+	form, err := checkParseFilename(c)
 	if err != nil {
 		return err
 	}
-	filePath := filepath.Join(files_folder, filename)
+	folder := lo.Ternary(form.Old, old_text_files_folder, files_folder)
+	filePath := filepath.Join(folder, form.Filename)
 	return os.Remove(filePath)
 }
 
 func downloadFile(c *fiber.Ctx) error {
-	filename, err := checkParseFilename(c)
+	form, err := checkParseFilename(c)
 	if err != nil {
 		return err
 	}
-	filePath := filepath.Join(files_folder, filename)
+	folder := lo.Ternary(form.Old, old_text_files_folder, files_folder)
+	filePath := filepath.Join(folder, form.Filename)
 	return c.SendFile(filePath)
 }
 
 func loadFileHandler(c *fiber.Ctx) error {
-	prefix, err := checkParseFilename(c)
-	if err != nil {
+	if err := checkPassword(c); err != nil {
 		return err
 	}
-	filePath, f, err := getFileByPrefix(prefix)
+	form := new(FilePrefixForm)
+	if err := parseValidate(form, c); err != nil {
+		return err
+	}
+	filePath, f, err := getFileByPrefix(form.Prefix, form.Old)
 	if err != nil {
 		return err
 	}
@@ -132,8 +137,9 @@ func loadFileHandler(c *fiber.Ctx) error {
 	return c.JSON(file)
 }
 
-func getFileByPrefix(prefix string) (filePath string, file *File, err error) {
-	pattern := filepath.Join(files_folder, prefix)
+func getFileByPrefix(prefix string, old bool) (filePath string, file *File, err error) {
+	folder := lo.Ternary(old, old_text_files_folder, files_folder)
+	pattern := filepath.Join(folder, prefix)
 	matches, err := filepath.Glob(pattern)
 	if err != nil {
 		return
@@ -147,15 +153,15 @@ func getFileByPrefix(prefix string) (filePath string, file *File, err error) {
 	return
 }
 
-func checkParseFilename(c *fiber.Ctx) (filename string, err error) {
-	if err = checkPassword(c); err != nil {
-		return
+func checkParseFilename(c *fiber.Ctx) (*FilenameForm, error) {
+	if err := checkPassword(c); err != nil {
+		return nil, err
 	}
 	form := new(FilenameForm)
-	if err = parseValidate(form, c); err != nil {
-		return
+	if err := parseValidate(form, c); err != nil {
+		return nil, err
 	}
-	return form.Filename, nil
+	return form, nil
 }
 
 func uploadFileHandler(c *fiber.Ctx) error {
@@ -204,7 +210,7 @@ func moveOldTextFile(ctime string) error {
 	if ctime == "" {
 		return nil
 	}
-	oldpath, file, err := getFileByPrefix(ctime + "-*")
+	oldpath, file, err := getFileByPrefix(ctime+"-*", false)
 	if err != nil {
 		return err
 	}

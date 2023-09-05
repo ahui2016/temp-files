@@ -169,22 +169,15 @@ function newFileItem(file) {
   }
 
   const downloadBtn = item.querySelector(".dl-btn");
-  if (is_old) {
-    downloadBtn.style.display = "none";
-  } else {
-    downloadBtn.addEventListener("click", event => {
-      event.preventDefault();
-      downloadFile(file, itemID);
-    });
-  }
+  downloadBtn.addEventListener("click", event => {
+    event.preventDefault();
+    downloadFile(file, itemID);
+  });
 
   const toggleBtn = item.querySelector(".toggle-del-btn");
   const delBtn = item.querySelector(".del-btn");
   delBtn.style.display = "none";
-  if (is_old) {
-    toggleBtn.style.display = "none";
-  } else {
-    toggleBtn.addEventListener("click", event => {
+  toggleBtn.addEventListener("click", event => {
       event.preventDefault();
       toggleDelBtn(itemID);
     });
@@ -192,7 +185,6 @@ function newFileItem(file) {
       event.preventDefault();
       deleteFile(file, itemID);
     });
-  }
 
   return item;
 }
@@ -203,6 +195,7 @@ function downloadFile(file, itemID) {
   const btn = item.find(".dl-btn");
   const data = {
     filename: `${file.CTime}-${file.Name}`,
+    old: !!is_old,
     pwd: localStorage.getItem("pwd"),
   };
 
@@ -251,6 +244,7 @@ function deleteFile(file, itemID) {
   const btn = item.find(".del-btn");
   const data = {
     filename: `${file.CTime}-${file.Name}`,
+    old: !!is_old,
     pwd: localStorage.getItem("pwd"),
   };
 

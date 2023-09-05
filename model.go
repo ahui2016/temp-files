@@ -76,6 +76,12 @@ func (f *File) TimeName() string {
 
 type FilenameForm struct {
 	Filename string `json:"filename" form:"filename" validate:"required"`
+	Old      bool   `json:"old" form:"old"`
+}
+
+type FilePrefixForm struct {
+	Prefix string `json:"prefix" form:"prefix" validate:"required"`
+	Old    bool   `json:"old" form:"old"`
 }
 
 type FileWithContent struct {
