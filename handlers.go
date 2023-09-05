@@ -18,6 +18,11 @@ type TextMsg struct {
 	Text string `json:"text"`
 }
 
+// TextMsg 用于向前端返回一个简单的整数。
+type Int64Msg struct {
+	Data int64 `json:"data"`
+}
+
 var validate = validator.New()
 
 // noCache is a middleware.
@@ -61,6 +66,31 @@ func getRecentFiles(c *fiber.Ctx) error {
 	}
 	slices.Reverse(files)
 	return c.JSON(files)
+}
+
+func getTotalSize(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
+	paths, err := filepath.Glob(files_folder + Separator + "*")
+	if err != nil {
+		return err
+	}
+	old_paths, err := filepath.Glob(old_text_files_folder + Separator + "*")
+	if err != nil {
+		return err
+	}
+	paths = append(paths, old_paths...)
+
+	var size int64
+	for _, f := range paths {
+		info, err := os.Stat(f)
+		if err != nil {
+			return err
+		}
+		size += info.Size()
+	}
+	return c.JSON(Int64Msg{size})
 }
 
 func deleteFile(c *fiber.Ctx) error {

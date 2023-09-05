@@ -276,6 +276,22 @@ function gotoOld() {
   window.location.href = "/?old=1";
 }
 
+function getTotalSize() {
+  const data = {
+    pwd: localStorage.getItem("pwd"),
+  };
+  Util.postJSON(data, {
+    url: "/api/total-size",
+    onSuccess: async (resp) => {
+      const totalSize = await resp.json();
+      console.log(`Total Size with Old Files: ${fileSizeToString(totalSize.data)}`);
+    },
+    onError: (err) => {
+      pageAlert.prepend(div(`${timeNow()} ${err}`).css("color", "red"));
+    }
+  });
+}
+
 </script>
 </body>
 </html>
