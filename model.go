@@ -9,10 +9,11 @@ import (
 )
 
 type AppConfig struct {
-	Host             string
-	UploadLimit      int64 // MB
-	Password         string
-	RecentFilesLimit int64
+	Host              string
+	UploadLimit       int64 // MB
+	Password          string
+	RecentFilesLimit  int64
+	OldTextFilesLimit int64
 }
 
 type File struct {

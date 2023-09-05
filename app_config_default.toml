@@ -8,3 +8,6 @@ Password = 'abcd'
 
 # 最近檔案數量（第一頁檔案數量上限）
 RecentFilesLimit = 100
+
+# 舊文字檔案木數量上限
+OldTextFilesLimit = 100

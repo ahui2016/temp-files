@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"slices"
 
 	"github.com/samber/lo"
 )
@@ -54,4 +56,53 @@ func CopyFile(dstPath, srcPath string) error {
 	_, err1 := io.Copy(dst, src)
 	err2 := dst.Sync()
 	return WrapErrors(err1, err2)
+}
+
+func SortStrings(x []string) {
+	if slices.IsSorted(x) {
+		return
+	}
+	slices.Sort(x)
+}
+
+// DeleteOldFiles 刪除 folder 裡 n 個最舊的檔案。
+func DeleteOldFiles(folder string, n int) error {
+	Separator := string(filepath.Separator)
+	files, err := filepath.Glob(folder + Separator + "*")
+	if err != nil {
+		return err
+	}
+	SortStrings(files)
+	if len(files) < n {
+		n = len(files)
+	}
+	for _, f := range files[:n] {
+		if err := os.Remove(f); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// RemainNewFiles 刪除 folder 裡的舊檔案, 剩下 n 個最新的檔案。
+func RemainNewFiles(folder string, n int64) error {
+	Separator := string(filepath.Separator)
+	files, err := filepath.Glob(folder + Separator + "*")
+	if err != nil {
+		return err
+	}
+	SortStrings(files)
+
+	length := int64(len(files))
+	if length <= n {
+		return nil
+	}
+
+	n_del := length - n
+	for _, f := range files[:n_del] {
+		if err := os.Remove(f); err != nil {
+			return err
+		}
+	}
+	return nil
 }

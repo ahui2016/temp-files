@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ahui2016/temp-files/util"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/lo"
@@ -208,7 +209,10 @@ func moveOldTextFile(ctime string) error {
 		return err
 	}
 	newpath := filepath.Join(old_text_files_folder, file.TimeName())
-	return os.Rename(oldpath, newpath)
+	if err := os.Rename(oldpath, newpath); err != nil {
+		return err
+	}
+	return util.RemainNewFiles(old_text_files_folder, (app_config.OldTextFilesLimit))
 }
 
 func allFiles(filter string) ([]*File, error) {
@@ -217,6 +221,7 @@ func allFiles(filter string) ([]*File, error) {
 	if err != nil {
 		return nil, err
 	}
+	util.SortStrings(paths)
 	if filter == "recent" {
 		if int64(len(paths)) > app_config.RecentFilesLimit {
 			paths = paths[:app_config.RecentFilesLimit]
