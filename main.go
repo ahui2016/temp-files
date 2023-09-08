@@ -30,6 +30,7 @@ func main() {
 	api.Post("/download-file", downloadFile)
 	api.Post("/load-file-by-prefix", loadFileHandler)
 	api.Post("/save-text-file", saveTextFile)
+	api.Post("/zip-text-files", zipTextFiles)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

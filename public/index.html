@@ -296,6 +296,21 @@ function getTotalSize() {
   });
 }
 
+function zipTextFiles() {
+  const data = {
+    pwd: localStorage.getItem("pwd"),
+  };
+  Util.postJSON(data, {
+    url: "/api/zip-text-files",
+    onSuccess: (resp) => {
+      console.log("已打包 zip 檔案，請刷新頁面查看 Recent Files");
+    },
+    onError: (err) => {
+      pageAlert.prepend(div(`${timeNow()} ${err}`).css("color", "red"));
+    }
+  });
+}
+
 </script>
 </body>
 </html>

@@ -207,6 +207,9 @@ func saveTextFile(c *fiber.Ctx) error {
 }
 
 func zipTextFiles(c *fiber.Ctx) error {
+	if err := checkPassword(c); err != nil {
+		return err
+	}
 	files, err := getTextFiles()
 	if err != nil {
 		return err
