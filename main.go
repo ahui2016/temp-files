@@ -15,6 +15,8 @@ func main() {
 	app.Use(noCache)
 
 	app.Static("/", public_folder)
+	app.Static("/"+FilesFolderName, files_folder)
+	app.Static("/"+OldTextFilesFolderName, old_text_files_folder)
 
 	api := app.Group("/api")
 

@@ -3,10 +3,39 @@ package main
 import (
 	"mime/multipart"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var MediaSuffixList = []string{
+	"html",
+	"htm",
+	"css",
+	"xml",
+	"gif",
+	"jpeg",
+	"jpg",
+	"atom",
+	"rss",
+	"txt",
+	"png",
+	"svg",
+	"webp",
+	"ico",
+	"bmp",
+	"js",
+	"json",
+	"pdf",
+	"mp3",
+	"m4a",
+	"mp4",
+	"mpeg",
+	"mpg",
+	"flv",
+	"avi",
+}
 
 type AppConfig struct {
 	Host              string
@@ -17,10 +46,11 @@ type AppConfig struct {
 }
 
 type File struct {
-	CTime  int64  // 服务器保存该文件的时间
-	Name   string // 原文件名
-	Size   int64  // length in bytes for regular files
-	IsText bool   // true if File.Name ends with ".txt" or ".md"
+	CTime   int64  // 服务器保存该文件的时间
+	Name    string // 原文件名
+	Size    int64  // length in bytes for regular files
+	IsText  bool   // true if File.Name ends with ".txt" or ".md"
+	IsMedia bool   // true if File.Name ends with ".jpg" or ".pdf" etc.
 }
 
 // NewFileWithName 主要是为了更方便使用 File.TimeName(),
@@ -52,11 +82,22 @@ func NewFileFromServer(filePath string) (*File, error) {
 		return nil, err
 	}
 	f.CTime, f.Name, err = splitTimeName(info.Name())
+	if err != nil {
+		return nil, err
+	}
 	f.Size = info.Size()
-	if strings.HasSuffix(f.Name, ".txt") || strings.HasSuffix(f.Name, ".md") {
+	suffix := lastElement(strings.Split(f.Name, "."))
+	if strings.HasSuffix(suffix, "txt") || strings.HasSuffix(suffix, "md") {
 		f.IsText = true
 	}
-	return f, err
+	if slices.Contains(MediaSuffixList, suffix) {
+		f.IsMedia = true
+	}
+	return f, nil
+}
+
+func lastElement(s []string) string {
+	return s[len(s)-1]
 }
 
 func splitTimeName(timeName string) (time int64, name string, err error) {

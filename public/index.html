@@ -155,6 +155,14 @@ function newFileItem(file) {
     } else {
       viewBtn.href = `md.html?ctime=${file.CTime}`;
     }
+  } else if (file.IsMedia) {
+    const ctimeName = `${file.CTime}-${file.Name}`;
+    const encodedName = encodeURIComponent(ctimeName);
+    if (is_old) {
+      viewBtn.href = `/old/${encodedName}`;
+    } else {
+      viewBtn.href = `/files/${encodedName}`;
+    }
   } else {
     viewBtn.style.display = "none";
   }
