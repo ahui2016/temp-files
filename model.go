@@ -53,15 +53,21 @@ type File struct {
 	IsMedia bool   // true if File.Name ends with ".jpg" or ".pdf" etc.
 }
 
-// NewFileWithName 主要是为了更方便使用 File.TimeName(),
-// 因此 Size 和 IsText 不重要。
+// NewFileWithName 主要是为了更方便使用 File.TimeName(), 因此 Size 不重要。
 func NewFileWithName(name string) *File {
-	return &File{
+	f := &File{
 		CTime: time.Now().Unix(),
 		Name:  name,
 		// Size:  不重要
-		// IsText: 此时文件类型不重要
 	}
+	suffix := lastElement(strings.Split(f.Name, "."))
+	if strings.HasSuffix(suffix, "txt") || strings.HasSuffix(suffix, "md") {
+		f.IsText = true
+	}
+	if slices.Contains(MediaSuffixList, suffix) {
+		f.IsMedia = true
+	}
+	return f
 }
 
 // NewFileFromUser 根据用户上传的文件解析出一个 File

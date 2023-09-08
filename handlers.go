@@ -206,6 +206,16 @@ func saveTextFile(c *fiber.Ctx) error {
 	return c.JSON(TextMsg{strconv.FormatInt(file.CTime, 10)})
 }
 
+func zipTextFiles(c *fiber.Ctx) error {
+	files, err := getTextFiles()
+	if err != nil {
+		return err
+	}
+	file := NewFileWithName("all-text-files.zip")
+	zipFilePath := filepath.Join(files_folder, file.TimeName())
+	return util.ZipPaths(zipFilePath, files)
+}
+
 func moveOldTextFile(ctime string) error {
 	if ctime == "" {
 		return nil
@@ -237,6 +247,23 @@ func allFiles(filter string) ([]*File, error) {
 		return nil, nil
 	}
 	return pathsToFiles(paths)
+}
+
+func getTextFiles() (textFiles []string, err error) {
+	paths, err := filepath.Glob(files_folder + Separator + "*")
+	if err != nil {
+		return
+	}
+	if len(paths) == 0 {
+		return nil, nil
+	}
+	for _, path := range paths {
+		file := NewFileWithName(filepath.Base(path))
+		if file.IsText {
+			textFiles = append(textFiles, path)
+		}
+	}
+	return
 }
 
 func pathsToFiles(paths []string) (files []*File, err error) {
