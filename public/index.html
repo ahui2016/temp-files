@@ -37,7 +37,7 @@
 <div id="file-list" class="mt-4 mb-5"></div>
 
 <footer class="mt-6 mb-3">
-  GitHub Repository:
+  repository:
   <a href="https://github.com/ahui2016/temp-files" target="_blank">
     github.com/ahui2016/temp-files
   </a>
@@ -125,13 +125,15 @@ async function loadFiles() {
 }
 
 function appendFiles(files, url) {
+  let n = 0;
   let size = 0;
   files.forEach(file => {
     fileList.appendChild(newFileItem(file));
     size += file.Size;
+    n++;
   });
   if (is_all) {
-    totalSize.text(`(${fileSizeToString(size)})`);
+    totalSize.text(`(${n} files, ${fileSizeToString(size)})`);
   }
 }
 
