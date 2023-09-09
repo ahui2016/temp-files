@@ -148,6 +148,9 @@ function newFileItem(file) {
   const filesize = item.querySelector(".filesize");
   filesize.textContent = `(${fileSizeToString(file.Size)})`;
 
+  const ctimeName = `${file.CTime}-${file.Name}`;
+  const encodedName = encodeURIComponent(ctimeName);
+
   const viewBtn = item.querySelector(".view-btn");
   if (file.Name.toLowerCase().endsWith(".md")) {
     if (is_old) {
@@ -156,8 +159,6 @@ function newFileItem(file) {
       viewBtn.href = `md.html?ctime=${file.CTime}`;
     }
   } else if (file.IsMedia) {
-    const ctimeName = `${file.CTime}-${file.Name}`;
-    const encodedName = encodeURIComponent(ctimeName);
     if (is_old) {
       viewBtn.href = `/old/${encodedName}`;
     } else {
@@ -179,10 +180,14 @@ function newFileItem(file) {
   }
 
   const downloadBtn = item.querySelector(".dl-btn");
-  downloadBtn.addEventListener("click", event => {
-    event.preventDefault();
-    downloadFile(file, itemID);
-  });
+  if (is_old) {
+    downloadBtn.href = `/old/${encodedName}`;
+  } else {
+    downloadBtn.addEventListener("click", event => {
+      event.preventDefault();
+      downloadFile(file, itemID);
+    });
+  }
 
   const toggleBtn = item.querySelector(".toggle-del-btn");
   const delBtn = item.querySelector(".del-btn");
