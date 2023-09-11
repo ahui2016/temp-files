@@ -182,6 +182,7 @@ function newFileItem(file) {
   const downloadBtn = item.querySelector(".dl-btn");
   if (is_old) {
     downloadBtn.href = `/old/${encodedName}`;
+    downloadBtn.setAttribute("download", "");
   } else {
     downloadBtn.addEventListener("click", event => {
       event.preventDefault();
