@@ -60,8 +60,11 @@ const submitBtn = $("#edit-submit");
 const submitAlert = $("#submit-alert");
 
 let is_new_file = true;
-const createSuccessMsg = "保存成功（創建了一個新的文字檔案）"
-const updateSuccessMsg = "成功更新檔案";
+const createSuccessMsg = span("保存成功（創建了一個新的文字檔案）");
+const updateSuccessMsg = [
+  span("成功更新檔案, 並產生一個舊檔案 → "),
+  link("/?old=1").text("old"),
+];
 
 init();
 
@@ -105,7 +108,7 @@ submitBtn.on("click", event => {
       fileCTime = msg.text;
       $("tilte").text(nameInput.val());
       const successMsg = is_new_file ? createSuccessMsg : updateSuccessMsg;
-      submitAlert.prepend( div(`${timeNow()} ${successMsg}`) );
+      submitAlert.prepend( div(`${timeNow()} `).append(successMsg) );
       is_new_file = false;
     },
     onError: (err) => {

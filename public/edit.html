@@ -130,7 +130,10 @@ function initSubmitBtn() {
         const msg = await resp.json();
         fileCTime = msg.text;
         $("tilte").text(nameInput.val());
-        submitAlert.prepend( div(`${timeNow()} 成功更新檔案`) );
+        submitAlert.prepend( div().append(
+          span(`${timeNow()} 成功更新檔案, 並產生一個舊檔案 → `),
+          link("/?old=1").text("old"),
+        ) );
       },
       onError: (err) => {
         submitAlert.prepend( div(`${timeNow()} ${err}`).css("color", "red") );

@@ -58,6 +58,10 @@ function p(text) {
   return ce("p");
 }
 
+function link(href) {
+  return ce("a").attr({href: href});
+}
+
 /**
  * jElem is a string or JQuery<HTMLElement>
  */
