@@ -78,7 +78,6 @@ function loadFile(ctime) {
   const data = {
     prefix: ctime + "-*",
     old: !!is_old,
-    pwd: localStorage.getItem("pwd"),
   };
   Util.postJSON(data, {
     url: "/api/load-file-by-prefix",

@@ -99,8 +99,7 @@ function setHomeLink() {
 }
 
 async function loadFiles() {
-  const data = {pwd: localStorage.getItem("pwd")};
-  Util.postJSON(data, {
+  Util.fetch({
     url: files_url,
     onSuccess: async (resp) => {
       const files = await resp.json();
@@ -211,8 +210,6 @@ function downloadFile(file, itemID) {
   const btn = item.find(".dl-btn");
   const data = {
     filename: `${file.CTime}-${file.Name}`,
-    old: !!is_old,
-    pwd: localStorage.getItem("pwd"),
   };
 
   Util.disable(btn);
@@ -261,7 +258,6 @@ function deleteFile(file, itemID) {
   const data = {
     filename: `${file.CTime}-${file.Name}`,
     old: !!is_old,
-    pwd: localStorage.getItem("pwd"),
   };
 
   Util.disable(btn);
@@ -287,10 +283,7 @@ function gotoOld() {
 }
 
 function getTotalSize() {
-  const data = {
-    pwd: localStorage.getItem("pwd"),
-  };
-  Util.postJSON(data, {
+  Util.fetch({
     url: "/api/total-size",
     onSuccess: async (resp) => {
       const totalSize = await resp.json();
@@ -303,10 +296,7 @@ function getTotalSize() {
 }
 
 function zipTextFiles() {
-  const data = {
-    pwd: localStorage.getItem("pwd"),
-  };
-  Util.postJSON(data, {
+  Util.fetch({
     url: "/api/zip-text-files",
     onSuccess: (resp) => {
       console.log("已打包 zip 檔案，請刷新頁面查看 Recent Files");

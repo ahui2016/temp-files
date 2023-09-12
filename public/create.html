@@ -69,11 +69,11 @@ const updateSuccessMsg = [
 init();
 
 function init() {
-  checkPwd();
+  checkLogin();
 }
 
-function checkPwd() {
-  Util.checkPwd({
+function checkLogin() {
+  Util.checkLogin({
     onSuccess: () => {
       Util.focus(nameInput);
     },
@@ -95,7 +95,6 @@ submitBtn.on("click", event => {
     return false;
   }
   const data = {
-    pwd: localStorage.getItem("pwd"),
     ctime: fileCTime,
     name: filename,
     content: contentsArea.val()

@@ -34,10 +34,31 @@ func noCache(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-func getAllFiles(c *fiber.Ctx) error {
+func checkLoginHandler(c *fiber.Ctx) error {
+	if isLoggedIn(c) {
+		return nil
+	}
+	return fmt.Errorf("Require Login")
+}
+
+func loginHandler(c *fiber.Ctx) error {
+	if isLoggedIn(c) {
+		return nil
+	}
 	if err := checkPassword(c); err != nil {
 		return err
 	}
+	return sessionSet(c, cookieName, true)
+}
+
+func logoutHandler(c *fiber.Ctx) error {
+	if isLoggedOut(c) {
+		return nil
+	}
+	return sessionDelete(c, cookieName)
+}
+
+func getAllFiles(c *fiber.Ctx) error {
 	files, err := allFiles("")
 	if err != nil {
 		return err
@@ -46,9 +67,6 @@ func getAllFiles(c *fiber.Ctx) error {
 }
 
 func getOldTextFiles(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	files, err := allFiles("old")
 	if err != nil {
 		return err
@@ -58,9 +76,6 @@ func getOldTextFiles(c *fiber.Ctx) error {
 }
 
 func getRecentFiles(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	files, err := allFiles("recent")
 	if err != nil {
 		return err
@@ -70,9 +85,6 @@ func getRecentFiles(c *fiber.Ctx) error {
 }
 
 func getTotalSize(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	paths, err := filepath.Glob(files_folder + Separator + "*")
 	if err != nil {
 		return err
@@ -109,15 +121,11 @@ func downloadFile(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	folder := lo.Ternary(form.Old, old_text_files_folder, files_folder)
-	filePath := filepath.Join(folder, form.Filename)
+	filePath := filepath.Join(files_folder, form.Filename)
 	return c.SendFile(filePath)
 }
 
 func loadFileHandler(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	form := new(FilePrefixForm)
 	if err := parseValidate(form, c); err != nil {
 		return err
@@ -154,9 +162,6 @@ func getFileByPrefix(prefix string, old bool) (filePath string, file *File, err 
 }
 
 func checkParseFilename(c *fiber.Ctx) (*FilenameForm, error) {
-	if err := checkPassword(c); err != nil {
-		return nil, err
-	}
 	form := new(FilenameForm)
 	if err := parseValidate(form, c); err != nil {
 		return nil, err
@@ -165,9 +170,6 @@ func checkParseFilename(c *fiber.Ctx) (*FilenameForm, error) {
 }
 
 func uploadFileHandler(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
@@ -181,9 +183,6 @@ func uploadFileHandler(c *fiber.Ctx) error {
 }
 
 func saveTextFile(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	form := new(FileWithContent)
 	if err := parseValidate(form, c); err != nil {
 		return err
@@ -207,9 +206,6 @@ func saveTextFile(c *fiber.Ctx) error {
 }
 
 func zipTextFiles(c *fiber.Ctx) error {
-	if err := checkPassword(c); err != nil {
-		return err
-	}
 	files, err := getTextFiles()
 	if err != nil {
 		return err
@@ -227,7 +223,9 @@ func moveOldTextFile(ctime string) error {
 	if err != nil {
 		return err
 	}
-	newpath := filepath.Join(old_text_files_folder, file.TimeName())
+	// 更新时间，保证文件移动后位于列表顶端。
+	newfile := NewFileWithName(file.Name)
+	newpath := filepath.Join(old_text_files_folder, newfile.TimeName())
 	if err := os.Rename(oldpath, newpath); err != nil {
 		return err
 	}
@@ -278,20 +276,6 @@ func pathsToFiles(paths []string) (files []*File, err error) {
 		files = append(files, f)
 	}
 	return
-}
-
-func checkPassword(c *fiber.Ctx) error {
-	type Pass struct {
-		Word string `json:"pwd" form:"pwd"`
-	}
-	pwd := new(Pass)
-	if err := c.BodyParser(pwd); err != nil {
-		return err
-	}
-	if pwd.Word != app_config.Password {
-		return fmt.Errorf("wrong password")
-	}
-	return nil
 }
 
 func parseValidate(form any, c *fiber.Ctx) error {

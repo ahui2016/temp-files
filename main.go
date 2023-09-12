@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
 func main() {
@@ -12,25 +13,37 @@ func main() {
 		BodyLimit: int(app_config.UploadLimit) * MB,
 	})
 
+	limitHandler := limiter.New(limiter.Config{
+		Max: app_config.RepeatRequestLimit,
+	})
+
 	app.Use(noCache)
 
 	app.Static("/", public_folder)
+
+	app.Use("/"+FilesFolderName, checkLoginMidWare)
 	app.Static("/"+FilesFolderName, files_folder)
+
+	app.Use("/"+OldTextFilesFolderName, checkLoginMidWare)
 	app.Static("/"+OldTextFilesFolderName, old_text_files_folder)
 
-	api := app.Group("/api")
+	app.Get("/check-login", checkLoginHandler)
+	app.Get("/logout", logoutHandler)
 
-	api.Post("/check-pwd", checkPassword)
-	api.Post("/all-files", getAllFiles)
-	api.Post("/recent-files", getRecentFiles)
-	api.Post("/old-text-files", getOldTextFiles)
-	api.Post("/total-size", getTotalSize)
+	app.Post("/login", limitHandler, loginHandler)
+
+	api := app.Group("/api", checkLoginMidWare)
+
+	api.Get("/all-files", getAllFiles)
+	api.Get("/recent-files", getRecentFiles)
+	api.Get("/old-text-files", getOldTextFiles)
+	api.Get("/total-size", getTotalSize)
 	api.Post("/upload-file", uploadFileHandler)
 	api.Post("/delete-file", deleteFile)
 	api.Post("/download-file", downloadFile)
 	api.Post("/load-file-by-prefix", loadFileHandler)
 	api.Post("/save-text-file", saveTextFile)
-	api.Post("/zip-text-files", zipTextFiles)
+	api.Get("/zip-text-files", zipTextFiles)
 
 	log.Fatal(app.Listen(app_config.Host))
 }

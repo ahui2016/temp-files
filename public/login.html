@@ -20,13 +20,13 @@
   <a href="upload.html">Upload</a>
 </div>
 
-<div id="page-alert"></div>
-
 <form id="login-form">
   <p>請登入</p>
   <input type="password" name="password" id="password">
   <button id="login-btn">login</button>
 </form>
+
+<div id="page-alert"></div>
 
 <div>
   <button id="logout-btn">Logout</button>
@@ -44,32 +44,88 @@ init();
 function init() {
   loginForm.hide();
   logoutBtn.hide();
-  checkPwd();
+  checkLogin();
 }
 
 loginBtn.on("click", event => {
   event.preventDefault();
   const pwd = pwdInput.val();
   if (!pwd) {
+    Util.focus(pwdInput);
     return;
   }
-  localStorage.setItem("pwd", pwd);
-  window.location.reload();
+  loginHandler()
 });
 
 logoutBtn.on("click", event => {
-  localStorage.setItem("pwd", "");
-  window.location.reload();
+  event.preventDefault();
+  Util.disable(logoutBtn);
+  Util.fetch({
+    url: "/logout",
+    onSuccess: () => {
+      pageAlert.html("").append(
+        p(`${timeNow()} 已登出。`).css("color", "blue")
+      );
+      loginForm.show();
+      logoutBtn.hide();
+      Util.focus(pwdInput);
+    },
+    onError: (err) => {
+      pageAlert.append(
+        div(`${timeNow()} ${err}`).css("color", "red")
+      );
+    },
+    onAlways: () => {
+      Util.enable(logoutBtn);
+    }
+  });
 });
 
-function checkPwd() {
-  Util.checkPwd({
+function loginHandler() {
+  const formData = new FormData();
+  formData.append("pwd", pwdInput.val());
+
+  const obj = {
+    method: "POST",
+    body: formData,
+  }
+
+  Util.disable(loginBtn);
+  Util.fetch({
+    url: "/login",
+    obj: obj,
     onSuccess: () => {
-      pageAlert.append(p(`${timeNow()} You've been logged in. (已登入)`).css("color", "blue"));
+      pageAlert.html("").append(
+        p(`${timeNow()} 成功登入。`).css("color", "blue")
+      );
+      loginForm.hide();
       logoutBtn.show();
     },
     onError: (err) => {
-      pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
+      pageAlert.prepend(
+        div(`${timeNow()} ${err}`).css("color", "red")
+      );
+      Util.focus(pwdInput);
+    },
+    onAlways: () => {
+      pwdInput.val(""); // 重要！清除密码。
+      Util.enable(loginBtn);
+    }
+  });
+}
+
+function checkLogin() {
+  Util.checkLogin({
+    onSuccess: () => {
+      pageAlert.append(
+        p(`${timeNow()} You've been logged in. (已登入)`).css("color", "blue")
+      );
+      logoutBtn.show();
+    },
+    onError: (err) => {
+      pageAlert.append(
+        p(`${timeNow()} ${err}`).css("color", "red")
+      );
       loginForm.show();
       Util.focus(pwdInput);
     },

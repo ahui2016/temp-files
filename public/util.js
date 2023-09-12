@@ -133,18 +133,9 @@ Util.postJSON = function (data, fetchOptions) {
 /**
  * handlers {onSuccess, onError}
  */
-Util.checkPwd = function (handlers) {
-  const formData = new FormData();
-  formData.append("pwd", localStorage.getItem("pwd"));
-
-  const obj = {
-    method: "POST",
-    body: formData,
-  }
-
+Util.checkLogin = function (handlers) {
   Util.fetch({
-    url: "/api/check-pwd",
-    obj: obj,
+    url: "/check-login",
     onSuccess: () => {
       if (handlers.onSuccess) handlers.onSuccess();
     },

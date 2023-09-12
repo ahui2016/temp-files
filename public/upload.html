@@ -62,13 +62,13 @@ const uploadStatus = $('#upload-status');
 init();
 
 function init() {
-  checkPwd();
+  checkLogin();
   uploadBtn.hide();
   uploadStatusArea.hide();
 }
 
-function checkPwd() {
-  Util.checkPwd({
+function checkLogin() {
+  Util.checkLogin({
     onError: (err) => {
       pageAlert.append(p(`${timeNow()} ${err}`).css("color", "red"));
       fileInput.style.display = "none";
@@ -118,7 +118,6 @@ uploadBtn.on('click', event => {
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("pwd", localStorage.getItem("pwd"));
   const obj = {
     method: "POST",
     body: formData,

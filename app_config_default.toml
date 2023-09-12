@@ -11,3 +11,7 @@ RecentFilesLimit = 100
 
 # 舊文字檔案木數量上限
 OldTextFilesLimit = 100
+
+# 嘗試密碼的頻率限制（次/分鐘）
+# https://docs.gofiber.io/api/middleware/limiter
+RepeatRequestLimit = 5
