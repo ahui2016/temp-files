@@ -2,6 +2,37 @@
 
 Save temporary files in the server. (保存臨時檔案到服務器)
 
+简而言之，如果你有一个 VPS, 在里面部署本软件后，你就获得了一个简单的网站，
+可随时通过任何电脑或手机上传或下载文件, **没有人会查看你的照片或审核你的文件**,
+也不用担心文件被删除或帐号被封禁。
+
+可在线新建和编辑 txt 或 md 文件，可在线预览 Markdown。
+
+## 极致简单
+
+这是一个用 Go 语言和 JavaScript 做的网站，用途主要是临时保存小文件。
+核心思想是极致简单, 尤其注重源代码的简单。因此，源代码非常直白、易读。
+前端使用原生 JavaScript, 因此不需要任何预编译，直接写 JS, 刷新前端即可生效。
+
+由于追求简单，部署后的网站并未对手机浏览器进行优化，比较适合在电脑上访问。
+
+## 安装运行
+
+0. 安装 Go 语言环境 <https://go.dev/doc/install> (要求 Go 1.21.0 以上)
+1. 请使用 git clone 或直接下载源码 zip <https://github.com/ahui2016/temp-files>
+2. 获得源码后，通过终端进入项目文件夹内 (`cd temp-files`)
+3. 执行命令 `go build`, 即可获得可执行文件 temp-files.exe
+4. 执行命令 `./temp-files.exe` (如果是 Linux 或 MacOS, 则是`./temp-files`)
+  - 至此，程序已启动，并显示网址 (默认是 http://127.0.0.1:5000)
+  - 通过浏览器访问网址即可使用，默认密码是 abcd
+5. 按 `Ctrl+C` 可终止程序
+
+### 设置(config)
+
+- 第一次执行 `./temp-files.exe` 之后，可得到文件 `app_config.toml`
+- 用文本编辑器打开 `app_config.toml` 可修改端口、密码等
+- 修改 `app_config.toml` 之后要重启程序才生效
+
 前端限制上传文件体积，可进控制台 `FileSizeLimit = 50*MB` 更改（但最终仍受后端限制）。
 建议不要上传太大的文件，本程序未针对大文件进行优化，主要应用场景是小文件。
 

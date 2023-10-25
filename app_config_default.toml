@@ -9,9 +9,9 @@ Password = 'abcd'
 # 最近檔案數量（第一頁檔案數量上限）
 RecentFilesLimit = 100
 
-# 舊文字檔案木數量上限
+# 舊文字檔案數量上限
 OldTextFilesLimit = 100
 
 # 嘗試密碼的頻率限制（次/分鐘）
 # https://docs.gofiber.io/api/middleware/limiter
-RepeatRequestLimit = 5
+RepeatRequestLimit = 3
